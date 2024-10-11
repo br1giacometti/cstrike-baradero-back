@@ -1,0 +1,7 @@
+{
+  "EMAIL_ALREADY_EXIST": "El email ya esta en uso.",
+  "INVALID_EMAIL": "Email invalido.",
+  "USER_NOT_FOUND": "Usuario no encontrado.",
+  "INVALID_PASSWORD": "Contraseña invalida.",
+  "USER_DOSENT_EXIST": "Usuario inexistente."
+}
