@@ -1,36 +1,39 @@
 import { Module } from '@nestjs/common';
-import { ProductMapperProfile } from '../autoMapper/ProductMapperProfile';
-import ProductController from '../controller/ProductController';
-import ProductService from 'Stock/application/service/ProductService';
-import ProductDataProvider from '../dataProvider/ProductDataProvider';
-import ProductRepository from 'Stock/application/repository/ProductRepository';
-import ProductValidations from 'Stock/application/validations/ProductValidations';
-import CategoryController from '../controller/CategoryController';
-import CategoryService from 'Stock/application/service/CategoryService';
-import CategoryRepository from 'Stock/application/repository/CategoryRepository';
-import CategoryDataProvider from '../dataProvider/CategoryDataProvider';
-import CategoryValidations from 'Stock/application/validations/CategoryValidations';
-import { CategoryMapperProfile } from '../autoMapper/CategoryMapperProfile';
+
+import PlayerService from 'Stock/application/service/PlayerService';
+
+import PlayerRepository from 'Stock/application/repository/PlayerRepository';
+import PlayerValidations from 'Stock/application/validations/PlayerValidations';
+import TeamController from '../controller/TeamController';
+import TeamService from 'Stock/application/service/TeamService';
+import TeamRepository from 'Stock/application/repository/TeamRepository';
+
+import TeamValidations from 'Stock/application/validations/TeamValidations';
+import { TeamMapperProfile } from '../autoMapper/TeamMapperProfile';
 import { HttpModule } from '@nestjs/axios';
+import TeamDataProvider from '../dataProvider/TeamDataProvider';
+import PlayerController from '../controller/PlayerController';
+import PlayerDataProvider from '../dataProvider/PlayerDataProvider';
+import { PlayerMapperProfile } from '../autoMapper/PlayerMapperProfile';
 
 @Module({
-  controllers: [ProductController, CategoryController],
+  controllers: [PlayerController, TeamController],
   imports: [HttpModule],
   providers: [
-    ProductService,
+    PlayerService,
     {
-      provide: ProductRepository,
-      useClass: ProductDataProvider,
+      provide: PlayerRepository,
+      useClass: PlayerDataProvider,
     },
-    ProductMapperProfile,
-    ProductValidations,
-    CategoryService,
-    CategoryValidations,
+    PlayerMapperProfile,
+    PlayerValidations,
+    TeamService,
+    TeamValidations,
     {
-      provide: CategoryRepository,
-      useClass: CategoryDataProvider,
+      provide: TeamRepository,
+      useClass: TeamDataProvider,
     },
-    CategoryMapperProfile,
+    TeamMapperProfile,
   ],
 })
 export default class StockModule {}
