@@ -15,9 +15,15 @@ import TeamDataProvider from '../dataProvider/TeamDataProvider';
 import PlayerController from '../controller/PlayerController';
 import PlayerDataProvider from '../dataProvider/PlayerDataProvider';
 import { PlayerMapperProfile } from '../autoMapper/PlayerMapperProfile';
+import TournamentController from '../controller/TournamentController';
+import TournamentService from 'Stock/application/service/TournamentService';
+import TournamentRepository from 'Stock/application/repository/TournamentRepository';
+import TournamentDataProvider from '../dataProvider/TournamentDataProvider';
+import { TournamentMapperProfile } from '../autoMapper/TournamentMapperProfile';
+import TournamentValidations from 'Stock/application/validations/TournamentValidations';
 
 @Module({
-  controllers: [PlayerController, TeamController],
+  controllers: [PlayerController, TeamController, TournamentController],
   imports: [HttpModule],
   providers: [
     PlayerService,
@@ -25,7 +31,14 @@ import { PlayerMapperProfile } from '../autoMapper/PlayerMapperProfile';
       provide: PlayerRepository,
       useClass: PlayerDataProvider,
     },
+    TournamentService,
+    {
+      provide: TournamentRepository,
+      useClass: TournamentDataProvider,
+    },
     PlayerMapperProfile,
+    TournamentMapperProfile,
+    TournamentValidations,
     PlayerValidations,
     TeamService,
     TeamValidations,

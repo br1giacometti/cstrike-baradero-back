@@ -4,8 +4,10 @@ import Player from './Player';
 export default class Team {
   @AutoMap()
   id: number;
+
   @AutoMap()
   name: string;
+
   @AutoMap(() => [Player]) // Array de Player
   players: Player[];
 

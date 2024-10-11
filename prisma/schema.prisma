@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,9 +20,13 @@ model User {
 }
 
 model Team {
-  id      Int      @id @default(autoincrement())
-  name    String   @unique
-  players Player[]
+  id             Int          @id @default(autoincrement())
+  name           String       @unique
+  players        Player[]
+  tournaments    Tournament[] // Relación implícita muchos a muchos
+  matchesAsTeamA Match[]      @relation("TeamA") // Relación como "Team A"
+  matchesAsTeamB Match[]      @relation("TeamB") // Relación como "Team B"
+  scoreTables    ScoreTable[]
 }
 
 model Player {
@@ -34,4 +35,41 @@ model Player {
   teamId    Int
   createdAt DateTime @default(now())
   team      Team?    @relation(fields: [teamId], references: [id])
+}
+
+model Tournament {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  startDate   DateTime
+  endDate     DateTime?
+  teams       Team[] // Relación implícita muchos a muchos
+  matches     Match[] // Relación implícita muchos a muchos
+  scoreTables ScoreTable[]
+  createdAt   DateTime     @default(now())
+}
+
+model Match {
+  id           Int      @id @default(autoincrement())
+  tournamentId Int
+  teamAId      Int
+  teamBId      Int
+  date         DateTime
+  result       String? // Ejemplo: "Team A ganó 16-10"
+  stats        Json? // Ejemplo: estadísticas del partido
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  teamA      Team       @relation("TeamA", fields: [teamAId], references: [id])
+  teamB      Team       @relation("TeamB", fields: [teamBId], references: [id])
+}
+
+model ScoreTable {
+  id           Int        @id @default(autoincrement())
+  tournamentId Int
+  teamId       Int
+  points       Int        @default(0) // Puntos acumulados por equipo
+  wins         Int        @default(0)
+  losses       Int        @default(0)
+  draws        Int        @default(0)
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  team         Team       @relation(fields: [teamId], references: [id])
 }
