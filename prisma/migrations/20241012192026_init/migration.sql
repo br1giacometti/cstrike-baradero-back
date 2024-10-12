@@ -109,9 +109,6 @@ CREATE UNIQUE INDEX "Player_name_key" ON "Player"("name");
 CREATE UNIQUE INDEX "Tournament_name_key" ON "Tournament"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MatchDay_name_key" ON "MatchDay"("name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_TeamToTournament_AB_unique" ON "_TeamToTournament"("A", "B");
 
 -- CreateIndex

@@ -2,6 +2,7 @@ import { AutoMap } from '@automapper/classes';
 import Team from './Team';
 import ScoreTable from './ScoreTable';
 import Match from './Match';
+import MatchDay from './MatchDay';
 
 export default class Tournament {
   @AutoMap()
@@ -27,6 +28,8 @@ export default class Tournament {
 
   @AutoMap()
   createdAt: Date;
+  @AutoMap(() => [MatchDay])
+  MatchDay?: MatchDay[];
 
   constructor(
     name: string,
@@ -36,6 +39,7 @@ export default class Tournament {
     endDate?: Date,
     matches?: Match[],
     scoreTables?: ScoreTable[],
+    MatchDay?: MatchDay[],
   ) {
     this.id = id; // Asignar 0 si no se proporciona id
     this.name = name;
@@ -45,5 +49,6 @@ export default class Tournament {
     this.matches = matches || [];
     this.scoreTables = scoreTables || [];
     this.createdAt = new Date();
+    this.MatchDay = MatchDay || [];
   }
 }

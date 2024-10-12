@@ -1,5 +1,6 @@
 import { AutoMap } from '@automapper/classes';
 import Match from 'Stock/domain/models/Match';
+import MatchDay from 'Stock/domain/models/MatchDay';
 import ScoreTable from 'Stock/domain/models/ScoreTable';
 import Team from 'Stock/domain/models/Team';
 
@@ -21,4 +22,7 @@ export class TournamentDto {
 
   @AutoMap(() => ScoreTable)
   scoreTables: ScoreTable[]; // Asegúrate de incluir las scoreTables si es necesario
+
+  @AutoMap(() => [MatchDay]) // Mapea MatchDay correctamente
+  MatchDay?: MatchDay[];
 }

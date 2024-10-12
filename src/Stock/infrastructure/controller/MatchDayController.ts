@@ -44,7 +44,6 @@ export default class MatchDayController {
   }
 
   @Post('/create')
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(MatchDay, MatchDayDto))
   async login(
     @Body() matchdayDto: CreateMatchDayDto,

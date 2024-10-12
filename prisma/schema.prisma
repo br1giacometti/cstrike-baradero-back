@@ -71,7 +71,7 @@ model Match {
 model MatchDay {
   id           Int     @id @default(autoincrement())
   tournamentId Int
-  name         String  @unique // Nombre de la jornada, por ejemplo, "Fecha 1", "Fecha 2", etc.
+  name         String // Nombre de la jornada, por ejemplo, "Fecha 1", "Fecha 2", etc.
   matches      Match[] // Relación uno a muchos con los partidos
 
   tournament Tournament @relation(fields: [tournamentId], references: [id])

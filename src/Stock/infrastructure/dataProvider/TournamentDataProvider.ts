@@ -64,9 +64,7 @@ export default class TournamentDataProvider implements TournamentRepository {
     }
   }
 
-  async getPointsByTournamentId(
-    tournamentId: number,
-  ): Promise<
+  async getPointsByTournamentId(tournamentId: number): Promise<
     Array<{
       idEquipo: number;
       nombreEquipo: string;
@@ -140,9 +138,11 @@ export default class TournamentDataProvider implements TournamentRepository {
       where: { id },
       include: {
         teams: true,
+        MatchDay: true,
         matches: {
           include: {
             matchStats: {
+              include: { player: true },
               orderBy: [
                 { teamId: 'asc' }, // Ordenar primero por teamId
                 { kills: 'desc' }, // Luego ordenar por kills en orden descendente

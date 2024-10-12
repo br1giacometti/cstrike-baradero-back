@@ -3,6 +3,8 @@ import { Tournament as ITournamentEntity } from '@prisma/client';
 import TeamEntity from './TeamEntity';
 import MatchEntity from './MatchEntity';
 import ScoreTableEntity from './ScoreTableEntity';
+import MatchDay from 'Stock/domain/models/MatchDay';
+import MatchDayEntity from './MatchDayEntity';
 
 class TournamentEntity implements ITournamentEntity {
   @AutoMap()
@@ -28,6 +30,9 @@ class TournamentEntity implements ITournamentEntity {
 
   @AutoMap(() => [ScoreTableEntity]) // Array de ScoreTableEntity
   scoreTables: ScoreTableEntity[];
+
+  @AutoMap(() => [MatchDayEntity]) // Asegúrate de mapear MatchDayEntity correctamente
+  MatchDay: MatchDayEntity[];
 }
 
 export default TournamentEntity;
