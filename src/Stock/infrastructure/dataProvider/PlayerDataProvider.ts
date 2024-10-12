@@ -62,28 +62,18 @@ export default class PlayerDataProvider implements PlayerRepository {
     skip: number,
     take: number,
     query: string,
-    categoryId?: string,
+    teamId?: string,
   ): Promise<[Player[], number]> {
     query = query == undefined ? '' : query;
 
     const where: any = {
-      AND: [
-        {
-          OR: [
-            { description: { contains: query, mode: 'insensitive' } },
-            { barCode: { contains: query, mode: 'insensitive' } },
-          ],
-        },
-        categoryId ? { categoryId: { equals: parseInt(categoryId) } } : {},
-      ],
+      AND: [teamId ? { categoryId: { equals: parseInt(teamId) } } : {}],
     };
 
     const players = await this.client.findMany({
       skip: skip,
       take: take,
-      include: {
-        team: true,
-      },
+      include: { team: true },
       where,
     });
     const count = await this.client.count({ where });
@@ -118,6 +108,13 @@ export default class PlayerDataProvider implements PlayerRepository {
       const playerEntity = await this.client.update({
         data: {
           name: partialPlayer.name,
+          team: {
+            connect: partialPlayer.teamId
+              ? { id: partialPlayer.teamId }
+              : undefined,
+            // Si deseas desconectar el equipo anterior, puedes hacerlo así:
+            // disconnect: true,
+          },
         },
         include: { team: true },
         where: {

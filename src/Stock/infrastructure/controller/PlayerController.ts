@@ -47,13 +47,13 @@ export default class PlayerController {
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
     @Query('query') query: string,
-    @Query('categoryId') categoryId: string,
+    @Query('teamId') teamId: string,
   ): Promise<{ data: Player[]; meta: PaginationMetaDto }> {
     const [players, paginationMeta] = await this.playerService.getAllPagination(
       +page,
       +limit,
       query,
-      categoryId,
+      teamId,
     );
 
     return { data: players, meta: paginationMeta };

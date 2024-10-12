@@ -69,13 +69,13 @@ export default class PlayerService {
     page: number,
     limit: number,
     query: string,
-    categoryId?: string,
+    teamId?: string,
   ): Promise<[Player[], PaginationMetaDto]> {
     const [players, totalItems] = await this.repository.findAndCountWithQuery(
       (page - 1) * limit,
       limit,
       query,
-      categoryId,
+      teamId,
     );
 
     const totalPages = Math.ceil(totalItems / limit);

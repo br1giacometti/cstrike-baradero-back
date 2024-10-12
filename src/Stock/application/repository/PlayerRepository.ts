@@ -10,6 +10,6 @@ export default abstract class PlayerRepository extends BaseRepository<Player> {
     skip: number,
     take: number,
     query: string,
-    categoryId?: string,
+    teamId?: string,
   ): Promise<[Player[], number]>;
 }
