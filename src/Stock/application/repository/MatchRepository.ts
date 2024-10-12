@@ -9,4 +9,10 @@ export default abstract class MatchRepository extends BaseRepository<Match> {
     query: string,
     categoryId?: string,
   ): Promise<[Match[], number]>;
+
+  // Agrega este método
+  abstract findByMatchDayId(
+    matchDayId: number,
+    teamId: number,
+  ): Promise<Match[]>;
 }

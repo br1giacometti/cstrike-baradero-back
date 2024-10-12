@@ -122,6 +122,30 @@ export default class MatchDataProvider implements MatchRepository {
     return this.classMapper.mapArrayAsync(matchs, MatchEntity, Match);
   }
 
+  // Implementación de findByMatchDayId
+  async findByMatchDayId(matchDayid: number, teamId: number): Promise<Match[]> {
+    const matchs = await this.client.findMany({
+      where: {
+        matchDayId: matchDayid, // Coincidir con matchDayId
+        OR: [
+          { teamAId: teamId }, // Coincidir con teamAId
+          { teamBId: teamId }, // O coincidir con teamBId
+        ],
+      },
+      include: {
+        tournament: true, // Incluye información del torneo
+        teamA: { include: { players: true } },
+        teamB: { include: { players: true } },
+        matchStats: true,
+      },
+      orderBy: {
+        id: 'asc', // Ordenar por ID en orden ascendente
+      },
+    });
+
+    return this.classMapper.mapArrayAsync(matchs, MatchEntity, Match);
+  }
+
   async delete(id: number): Promise<Match> {
     const matchEntity = await this.client.delete({ where: { id } });
 

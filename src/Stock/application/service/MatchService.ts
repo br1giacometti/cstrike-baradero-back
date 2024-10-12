@@ -54,8 +54,14 @@ export default class MatchService {
   }
 
   async fetchAllMatchs(): Promise<Match[]> {
-    const matchs = await this.repository.findAll();
-    return matchs;
+    return this.repository.findAll();
+  }
+
+  async fetchAllMatchsById(
+    matchDayId: number,
+    teamId: number,
+  ): Promise<Match[]> {
+    return this.repository.findByMatchDayId(matchDayId, teamId);
   }
 
   async getAllPagination(

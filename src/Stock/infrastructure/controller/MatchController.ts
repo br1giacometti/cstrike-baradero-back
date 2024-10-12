@@ -115,6 +115,34 @@ export default class MatchController {
       });
   }
 
+  @Get('/filter/:matchid/:teamid')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(MapInterceptor(Match, MatchDto, { isArray: true }))
+  async getAllMatchById(
+    @Param('matchid') matchId: string,
+    @Param('teamid') teamId: string,
+    @I18n() i18n: I18nContext,
+  ): Promise<MatchDto[]> {
+    return this.matchService
+      .fetchAllMatchsById(parseInt(matchId), parseInt(teamId))
+      .then((matchs) => matchs)
+      .catch((error) => {
+        switch (error.name) {
+          case 'MatchNotFoundException': {
+            throw new HttpException(i18n.t(error.message), 404);
+          }
+          case 'MatchDescriptionAlreadyInUseException': {
+            throw new HttpException(i18n.t(error.message), 404);
+          }
+          case 'MatchSkuAlreadyInUseException': {
+            throw new HttpException(i18n.t(error.message), 404);
+          }
+          default: {
+            throw new HttpException(error.message, 500);
+          }
+        }
+      });
+  }
   @Patch('/:id')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Match, MatchDto))
