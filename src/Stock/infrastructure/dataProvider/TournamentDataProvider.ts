@@ -64,11 +64,100 @@ export default class TournamentDataProvider implements TournamentRepository {
     }
   }
 
+  async getPointsByTournamentId(
+    tournamentId: number,
+  ): Promise<
+    Array<{
+      idEquipo: number;
+      nombreEquipo: string;
+      victoriasTotales: number;
+      derrotasTotales: number;
+      puntuacionTotal: number;
+    }>
+  > {
+    // Obtener el torneo y los partidos
+    const tournamentEntity = await this.client.findUnique({
+      where: { id: tournamentId },
+      include: {
+        teams: true,
+        matches: true,
+      },
+    });
+
+    // Verificar si el torneo existe
+    if (!tournamentEntity) {
+      throw new Error('Tournament not found');
+    }
+
+    // Inicializar un mapa para almacenar estadísticas de equipos
+    const teamStats = new Map<
+      number,
+      { wins: number; losses: number; points: number }
+    >();
+
+    // Inicializar las estadísticas para cada equipo
+    for (const team of tournamentEntity.teams) {
+      teamStats.set(team.id, { wins: 0, losses: 0, points: 0 });
+    }
+
+    // Recorrer los partidos y calcular puntos
+    for (const match of tournamentEntity.matches) {
+      const { resultTeamA, resultTeamB, teamAId, teamBId } = match;
+
+      if (resultTeamA > resultTeamB) {
+        // Equipo A gana
+        teamStats.get(teamAId)!.wins++;
+        teamStats.get(teamAId)!.points += 3; // Ganador recibe 3 puntos
+        teamStats.get(teamBId)!.losses++;
+      } else if (resultTeamA < resultTeamB) {
+        // Equipo B gana
+        teamStats.get(teamBId)!.wins++;
+        teamStats.get(teamBId)!.points += 3; // Ganador recibe 3 puntos
+        teamStats.get(teamAId)!.losses++;
+      } else {
+        // No hay empates según tu lógica
+        continue;
+      }
+    }
+
+    // Crear el resultado final
+    const result = tournamentEntity.teams.map((team) => {
+      const stats = teamStats.get(team.id);
+      return {
+        idEquipo: team.id,
+        nombreEquipo: team.name,
+        victoriasTotales: stats!.wins,
+        derrotasTotales: stats!.losses,
+        puntuacionTotal: stats!.points,
+      };
+    });
+
+    return result;
+  }
+
   async findById(id: number): Promise<Tournament | null> {
     const tournamentEntity = await this.client.findUnique({
       where: { id },
-      include: { teams: true, matches: true, scoreTables: true },
+      include: {
+        teams: true,
+        matches: {
+          include: {
+            matchStats: {
+              orderBy: [
+                { teamId: 'asc' }, // Ordenar primero por teamId
+                { kills: 'desc' }, // Luego ordenar por kills en orden descendente
+              ],
+            },
+          },
+        },
+        scoreTables: true,
+      },
     });
+
+    if (!tournamentEntity) {
+      return null;
+    }
+
     return this.classMapper.mapAsync(
       tournamentEntity,
       TournamentEntity,
@@ -114,9 +203,22 @@ export default class TournamentDataProvider implements TournamentRepository {
 
   async findAll(): Promise<Tournament[]> {
     const tournaments = await this.client.findMany({
-      include: { teams: true, matches: true, scoreTables: true },
+      include: {
+        teams: true,
+        matches: {
+          include: {
+            matchStats: {
+              orderBy: [
+                { teamId: 'asc' }, // Primero ordenamos por teamId
+                { kills: 'desc' }, // Luego ordenamos por kills en orden descendente
+              ],
+            },
+          },
+        },
+        scoreTables: true,
+      },
       orderBy: {
-        createdAt: 'desc', // Ordenar por descripción en orden ascendente
+        createdAt: 'desc', // Ordenar por createdAt en orden descendente
       },
     });
 

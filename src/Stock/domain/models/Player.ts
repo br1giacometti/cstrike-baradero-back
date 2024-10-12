@@ -12,11 +12,25 @@ export default class Player {
   teamId: number;
   @AutoMap(() => Team)
   team?: Team;
+  @AutoMap()
+  kills?: number;
 
-  constructor(name: string, team?: Team, id?: number, createdAt?: Date) {
+  @AutoMap()
+  deaths?: number;
+
+  constructor(
+    name: string,
+    team?: Team,
+    id?: number,
+    createdAt?: Date,
+    kills?: number,
+    deaths?: number,
+  ) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;
     this.team = team;
+    this.kills = kills;
+    this.deaths = deaths;
   }
 }

@@ -48,11 +48,33 @@ CREATE TABLE "Match" (
     "tournamentId" INTEGER NOT NULL,
     "teamAId" INTEGER NOT NULL,
     "teamBId" INTEGER NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
-    "result" TEXT,
-    "stats" JSONB,
+    "matchDayId" INTEGER NOT NULL,
+    "resultTeamA" INTEGER NOT NULL,
+    "resultTeamB" INTEGER NOT NULL,
+    "map" TEXT NOT NULL,
 
     CONSTRAINT "Match_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MatchDay" (
+    "id" SERIAL NOT NULL,
+    "tournamentId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "MatchDay_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MatchStats" (
+    "id" SERIAL NOT NULL,
+    "matchId" INTEGER NOT NULL,
+    "playerId" INTEGER NOT NULL,
+    "kills" INTEGER NOT NULL DEFAULT 0,
+    "deaths" INTEGER NOT NULL DEFAULT 0,
+    "teamId" INTEGER NOT NULL,
+
+    CONSTRAINT "MatchStats_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -87,6 +109,9 @@ CREATE UNIQUE INDEX "Player_name_key" ON "Player"("name");
 CREATE UNIQUE INDEX "Tournament_name_key" ON "Tournament"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "MatchDay_name_key" ON "MatchDay"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_TeamToTournament_AB_unique" ON "_TeamToTournament"("A", "B");
 
 -- CreateIndex
@@ -103,6 +128,21 @@ ALTER TABLE "Match" ADD CONSTRAINT "Match_teamAId_fkey" FOREIGN KEY ("teamAId") 
 
 -- AddForeignKey
 ALTER TABLE "Match" ADD CONSTRAINT "Match_teamBId_fkey" FOREIGN KEY ("teamBId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Match" ADD CONSTRAINT "Match_matchDayId_fkey" FOREIGN KEY ("matchDayId") REFERENCES "MatchDay"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MatchDay" ADD CONSTRAINT "MatchDay_tournamentId_fkey" FOREIGN KEY ("tournamentId") REFERENCES "Tournament"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MatchStats" ADD CONSTRAINT "MatchStats_matchId_fkey" FOREIGN KEY ("matchId") REFERENCES "Match"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MatchStats" ADD CONSTRAINT "MatchStats_playerId_fkey" FOREIGN KEY ("playerId") REFERENCES "Player"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MatchStats" ADD CONSTRAINT "MatchStats_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScoreTable" ADD CONSTRAINT "ScoreTable_tournamentId_fkey" FOREIGN KEY ("tournamentId") REFERENCES "Tournament"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

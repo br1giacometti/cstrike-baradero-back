@@ -14,7 +14,6 @@ export default class TournamentService {
   ) {}
 
   async createTournament(tournament: Tournament): Promise<Tournament> {
-    console.log(tournament);
     const tournamentCreated = await this.repository.insert({
       name: tournament.name,
       matches: tournament.matches,
@@ -71,6 +70,22 @@ export default class TournamentService {
   async findTournamentById(tournamentId: number): Promise<Tournament> {
     const tournament = await this.repository.findById(tournamentId);
     this.validator.validateExistingTournament(tournament);
+    return tournament;
+  }
+
+  async getPointsByTournamentId(tournamentId: number): Promise<
+    Array<{
+      idEquipo: number;
+      nombreEquipo: string;
+      victoriasTotales: number;
+      derrotasTotales: number;
+      puntuacionTotal: number;
+    }>
+  > {
+    const tournament = await this.repository.getPointsByTournamentId(
+      tournamentId,
+    );
+
     return tournament;
   }
 

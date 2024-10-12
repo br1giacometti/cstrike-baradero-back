@@ -1,20 +1,21 @@
 import { AutoMap } from '@automapper/classes';
+import Player from 'Stock/domain/models/Player';
 import Team from 'Stock/domain/models/Team';
 
-export class PlayerDto {
+export class MatchStatsDto {
   @AutoMap()
   id: number;
   @AutoMap()
-  name: string;
-  @AutoMap()
   teamId: number;
+
+  @AutoMap(() => Player)
+  player?: Player;
   @AutoMap()
-  createdAt: Date;
-  @AutoMap(() => Team)
-  team?: Team;
+  playerId: number;
   @AutoMap()
   kills?: number;
-
+  @AutoMap(() => Team)
+  team?: Team;
   @AutoMap()
   deaths?: number;
 }

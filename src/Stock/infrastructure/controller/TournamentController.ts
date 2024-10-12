@@ -121,6 +121,35 @@ export default class TournamentController {
       });
   }
 
+  @Get('/:id/points')
+  @UseGuards(JwtAuthGuard)
+  async getPointsByTournamentId(
+    @Param('id') tournamentId: string,
+    @I18n() i18n: I18nContext,
+  ): Promise<
+    Array<{
+      idEquipo: number;
+      nombreEquipo: string;
+      victoriasTotales: number;
+      derrotasTotales: number;
+      puntuacionTotal: number;
+    }>
+  > {
+    return this.tournamentService
+      .getPointsByTournamentId(parseInt(tournamentId))
+      .then((points) => points)
+      .catch((error) => {
+        switch (error.name) {
+          case 'TournamentNotFoundException': {
+            throw new HttpException(i18n.t(error.message), 404);
+          }
+          default: {
+            throw new HttpException(error.message, 500);
+          }
+        }
+      });
+  }
+
   @Patch('/:id')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Tournament, TournamentDto))

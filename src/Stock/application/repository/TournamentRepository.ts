@@ -12,4 +12,15 @@ export default abstract class TournamentRepository extends BaseRepository<Tourna
     query: string,
     categoryId?: string,
   ): Promise<[Tournament[], number]>;
+  abstract getPointsByTournamentId(
+    tournamentId: number,
+  ): Promise<
+    Array<{
+      idEquipo: number;
+      nombreEquipo: string;
+      victoriasTotales: number;
+      derrotasTotales: number;
+      puntuacionTotal: number;
+    }>
+  >;
 }

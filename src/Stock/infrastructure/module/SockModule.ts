@@ -21,9 +21,34 @@ import TournamentRepository from 'Stock/application/repository/TournamentReposit
 import TournamentDataProvider from '../dataProvider/TournamentDataProvider';
 import { TournamentMapperProfile } from '../autoMapper/TournamentMapperProfile';
 import TournamentValidations from 'Stock/application/validations/TournamentValidations';
+import MatchController from '../controller/MatchController';
+import MatchService from 'Stock/application/service/MatchService';
+import MatchRepository from 'Stock/application/repository/MatchRepository';
+import MatchDataProvider from '../dataProvider/MatchDataProvider';
+import { MatchMapperProfile } from '../autoMapper/MatchMapperProfile';
+import MatchValidations from 'Stock/application/validations/MatchValidations';
+import MatchStatsController from '../controller/MatchStatsController';
+import MatchStatsService from 'Stock/application/service/MatchStatsService';
+import MatchStatsRepository from 'Stock/application/repository/MatchStatsRepository';
+import { MatchStatsMapperProfile } from '../autoMapper/MatchStatsMapperProfile';
+import MatchStatsValidations from 'Stock/application/validations/MatchStatsValidations';
+import MatchStatsDataProvider from '../dataProvider/MatchStatsDataProvider';
+import MatchDay from 'Stock/domain/models/MatchDay';
+import MatchDayController from '../controller/MatchDayController';
+import MatchDayService from 'Stock/application/service/MatchDayService';
+import MatchDayRepository from 'Stock/application/repository/MatchRepository copy';
+import MatchDayDataProvider from '../dataProvider/MatchDayDataProvider';
+import { MatchDayMapperProfile } from '../autoMapper/MatchDayMapperProfile';
 
 @Module({
-  controllers: [PlayerController, TeamController, TournamentController],
+  controllers: [
+    PlayerController,
+    TeamController,
+    TournamentController,
+    MatchController,
+    MatchStatsController,
+    MatchDayController,
+  ],
   imports: [HttpModule],
   providers: [
     PlayerService,
@@ -36,9 +61,29 @@ import TournamentValidations from 'Stock/application/validations/TournamentValid
       provide: TournamentRepository,
       useClass: TournamentDataProvider,
     },
+    MatchService,
+    {
+      provide: MatchRepository,
+      useClass: MatchDataProvider,
+    },
+    MatchStatsService,
+    {
+      provide: MatchStatsRepository,
+      useClass: MatchStatsDataProvider,
+    },
+    MatchDayService,
+    {
+      provide: MatchDayRepository,
+      useClass: MatchDayDataProvider,
+    },
     PlayerMapperProfile,
     TournamentMapperProfile,
     TournamentValidations,
+    MatchMapperProfile,
+    MatchValidations,
+    MatchStatsMapperProfile,
+    MatchStatsValidations,
+    MatchDayMapperProfile,
     PlayerValidations,
     TeamService,
     TeamValidations,

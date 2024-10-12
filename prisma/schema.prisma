@@ -27,14 +27,16 @@ model Team {
   matchesAsTeamA Match[]      @relation("TeamA") // Relación como "Team A"
   matchesAsTeamB Match[]      @relation("TeamB") // Relación como "Team B"
   scoreTables    ScoreTable[]
+  matchStats     MatchStats[]
 }
 
 model Player {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  teamId    Int
-  createdAt DateTime @default(now())
-  team      Team?    @relation(fields: [teamId], references: [id])
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  teamId     Int
+  createdAt  DateTime     @default(now())
+  team       Team?        @relation(fields: [teamId], references: [id])
+  matchStats MatchStats[]
 }
 
 model Tournament {
@@ -46,20 +48,46 @@ model Tournament {
   matches     Match[] // Relación implícita muchos a muchos
   scoreTables ScoreTable[]
   createdAt   DateTime     @default(now())
+  MatchDay    MatchDay[]
 }
 
 model Match {
-  id           Int      @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   tournamentId Int
   teamAId      Int
   teamBId      Int
-  date         DateTime
-  result       String? // Ejemplo: "Team A ganó 16-10"
-  stats        Json? // Ejemplo: estadísticas del partido
+  matchDayId   Int // Relación con MatchDay
+  resultTeamA  Int // Resultado del equipo A
+  resultTeamB  Int // Resultado del equipo B
+  map          String // Nombre del mapa jugado
+
+  tournament Tournament   @relation(fields: [tournamentId], references: [id])
+  teamA      Team         @relation("TeamA", fields: [teamAId], references: [id])
+  teamB      Team         @relation("TeamB", fields: [teamBId], references: [id])
+  matchDay   MatchDay     @relation(fields: [matchDayId], references: [id])
+  matchStats MatchStats[]
+}
+
+model MatchDay {
+  id           Int     @id @default(autoincrement())
+  tournamentId Int
+  name         String  @unique // Nombre de la jornada, por ejemplo, "Fecha 1", "Fecha 2", etc.
+  matches      Match[] // Relación uno a muchos con los partidos
 
   tournament Tournament @relation(fields: [tournamentId], references: [id])
-  teamA      Team       @relation("TeamA", fields: [teamAId], references: [id])
-  teamB      Team       @relation("TeamB", fields: [teamBId], references: [id])
+}
+
+model MatchStats {
+  id       Int @id @default(autoincrement())
+  matchId  Int
+  playerId Int
+  kills    Int @default(0) // Asesinatos
+  deaths   Int @default(0) // Muertes
+  teamId   Int
+
+  match  Match  @relation(fields: [matchId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
+  team   Team   @relation(fields: [teamId], references: [id])
 }
 
 model ScoreTable {

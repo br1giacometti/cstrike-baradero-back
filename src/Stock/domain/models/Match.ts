@@ -1,6 +1,8 @@
 import { AutoMap } from '@automapper/classes';
 import Team from './Team';
 import Tournament from './Tournament';
+import MatchStats from './MatchStats'; // Importamos el modelo de MatchStats
+import MatchDay from './MatchDay';
 
 export default class Match {
   @AutoMap()
@@ -16,38 +18,51 @@ export default class Match {
   teamBId: number;
 
   @AutoMap()
-  date: Date;
+  matchDayId: number;
 
   @AutoMap()
-  result?: string; // Nullable para permitir resultados opcionales
+  matchDay?: MatchDay;
 
   @AutoMap()
-  stats?: Record<string, any>; // Campo Json para estadísticas
+  map?: string;
+
+  @AutoMap()
+  resultTeamA?: number;
+
+  @AutoMap()
+  resultTeamB?: number;
 
   @AutoMap(() => Tournament) // Relación con Tournament
-  tournament: Tournament;
+  tournament?: Tournament;
 
   @AutoMap(() => Team) // Relación con Team A
-  teamA: Team;
+  teamA?: Team;
 
   @AutoMap(() => Team) // Relación con Team B
-  teamB: Team;
+  teamB?: Team;
+
+  @AutoMap(() => [MatchStats]) // Relación con MatchStats
+  matchStats?: MatchStats[]; // Array de estadísticas de jugadores
 
   constructor(
     tournamentId: number,
     teamAId: number,
     teamBId: number,
-    date: Date,
-    result?: string,
-    stats?: Record<string, any>,
+    matchDayId: number,
+    map?: string,
+    resultTeamA?: number,
+    resultTeamB?: number,
+    matchStats?: MatchStats[], // Incluimos matchStats en el constructor
     id?: number,
   ) {
-    this.id = id; // Asignar 0 si no se proporciona id
+    this.id = id;
     this.tournamentId = tournamentId;
     this.teamAId = teamAId;
     this.teamBId = teamBId;
-    this.date = date;
-    this.result = result;
-    this.stats = stats;
+    this.matchDayId = matchDayId;
+    this.map = map;
+    this.resultTeamA = resultTeamA;
+    this.resultTeamB = resultTeamB;
+    this.matchStats = matchStats; // Asignamos matchStats
   }
 }
