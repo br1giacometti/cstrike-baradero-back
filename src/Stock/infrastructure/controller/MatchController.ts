@@ -61,7 +61,6 @@ export default class MatchController {
   }
 
   @Post('/create')
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Match, MatchDto))
   async login(
     @Body() matchDto: CreateMatchDto,
@@ -155,7 +154,7 @@ export default class MatchController {
     const match = await this.classMapper.mapAsync(
       matchDto,
       UpdateMatchDto,
-      Match, // Verifica que Match sea el tipo correcto
+      Match, //
     );
 
     return this.matchService
