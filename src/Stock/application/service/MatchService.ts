@@ -6,12 +6,15 @@ import PaginationMetaDto from 'Base/dto/PaginationMetaDto';
 import MatchRepository from '../repository/MatchRepository';
 import MatchValidations from '../validations/MatchValidations';
 import { MatchDto } from 'Stock/infrastructure/dto/Match/MatchDto';
+import MatchStatsService from './MatchStatsService';
+import MatchStats from 'Stock/domain/models/MatchStats';
 
 @Injectable()
 export default class MatchService {
   constructor(
     private readonly repository: MatchRepository,
     private readonly validator: MatchValidations,
+    private readonly matchStatService: MatchStatsService,
   ) {}
 
   async createMatch(match: Match): Promise<Match> {
@@ -24,13 +27,32 @@ export default class MatchService {
     });
     return matchCreated;
   }
-  async updateMatch(id: number, matchstats: Match): Promise<Match> {
-    const matchstatsCreated = await this.repository.update(id, {
-      map: matchstats.map,
-      resultTeamA: matchstats.resultTeamA,
-      resultTeamB: matchstats.resultTeamB,
+  async updateMatch(id: number, match: Match): Promise<Match> {
+    console.log(match); // Verifica el objeto completo en la consola
+
+    // Validación adicional para matchStats
+    if (!match.matchStats) {
+      console.error('matchStats está undefined');
+      throw new Error('matchStats no está definido');
+    }
+
+    if (!Array.isArray(match.matchStats)) {
+      console.error('matchStats no es un array:', match.matchStats);
+      throw new Error('matchStats debe ser un array');
+    }
+
+    const matchUpdated = await this.repository.update(id, {
+      map: match.map,
+      resultTeamA: match.resultTeamA,
+      resultTeamB: match.resultTeamB,
     });
-    return matchstatsCreated;
+
+    // Crear matchStats
+    for (const stat of match.matchStats) {
+      await this.matchStatService.createMatchStats(stat);
+    }
+
+    return matchUpdated;
   }
 
   async deleteMatch(matchId: number): Promise<Match> {

@@ -59,8 +59,9 @@ export default class MatchDataProvider implements MatchRepository {
       where: { id },
       include: {
         tournament: true, // Incluye información del torneo
-        teamA: true, // Incluye información del equipo A
-        teamB: true, // Incluye información del equipo B
+        teamA: { include: { players: true } },
+        teamB: { include: { players: true } },
+        matchStats: { include: { player: true } },
       },
     });
     return this.classMapper.mapAsync(matchEntity, MatchEntity, Match);
@@ -136,7 +137,7 @@ export default class MatchDataProvider implements MatchRepository {
         tournament: true, // Incluye información del torneo
         teamA: { include: { players: true } },
         teamB: { include: { players: true } },
-        matchStats: true,
+        matchStats: { include: { player: true }, orderBy: { kills: 'desc' } },
       },
       orderBy: {
         id: 'asc', // Ordenar por ID en orden ascendente
