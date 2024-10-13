@@ -17,6 +17,9 @@ class TournamentEntity implements ITournamentEntity {
   startDate: Date;
 
   @AutoMap()
+  isActive: boolean;
+
+  @AutoMap()
   endDate: Date | null; // Puede ser nulo
 
   @AutoMap()

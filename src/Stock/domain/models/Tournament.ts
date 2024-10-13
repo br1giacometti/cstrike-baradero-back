@@ -31,6 +31,9 @@ export default class Tournament {
   @AutoMap(() => [MatchDay])
   MatchDay?: MatchDay[];
 
+  @AutoMap()
+  isActive?: Boolean;
+
   constructor(
     name: string,
     startDate: Date,
@@ -40,6 +43,7 @@ export default class Tournament {
     matches?: Match[],
     scoreTables?: ScoreTable[],
     MatchDay?: MatchDay[],
+    isActive?: Boolean,
   ) {
     this.id = id; // Asignar 0 si no se proporciona id
     this.name = name;
@@ -50,5 +54,6 @@ export default class Tournament {
     this.scoreTables = scoreTables || [];
     this.createdAt = new Date();
     this.MatchDay = MatchDay || [];
+    this.isActive = isActive;
   }
 }

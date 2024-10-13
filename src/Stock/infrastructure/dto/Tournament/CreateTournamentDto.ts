@@ -11,6 +11,9 @@ export class CreateTournamentDto {
   name: string;
 
   @AutoMap()
+  isActive?: Boolean;
+
+  @AutoMap()
   createdAt: Date; // Se puede inicializar con la fecha actual
 
   @AutoMap(() => [Team]) // Aquí especificas que es un array de Team

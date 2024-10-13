@@ -35,6 +35,7 @@ CREATE TABLE "Player" (
 CREATE TABLE "Tournament" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "isActive" BOOLEAN DEFAULT true,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

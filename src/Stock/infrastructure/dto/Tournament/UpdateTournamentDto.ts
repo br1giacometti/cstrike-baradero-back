@@ -11,6 +11,9 @@ export class UpdateTournamentDto {
   name: string;
 
   @AutoMap()
+  isActive?: Boolean;
+
+  @AutoMap()
   createdAt: Date; // Esta propiedad puede no ser necesaria en una actualización, según tu lógica de negocio
 
   @AutoMap()

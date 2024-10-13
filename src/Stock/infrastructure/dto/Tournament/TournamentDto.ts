@@ -14,6 +14,9 @@ export class TournamentDto {
   @AutoMap()
   createdAt: Date;
 
+  @AutoMap()
+  isActive?: Boolean;
+
   @AutoMap(() => [Team])
   teams: Team[]; // Cambia teamId por teams
 
