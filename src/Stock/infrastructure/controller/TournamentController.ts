@@ -129,7 +129,6 @@ export default class TournamentController {
   }
 
   @Get('/points/:id')
-  @UseGuards(JwtAuthGuard)
   async getPointsByTournamentId(@I18n() i18n: I18nContext): Promise<
     Array<{
       idEquipo: number;

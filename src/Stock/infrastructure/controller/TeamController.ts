@@ -29,7 +29,6 @@ export default class TeamController {
   ) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Team, TeamDto, { isArray: true }))
   async getAllTeamss(): Promise<TeamDto[]> {
     return this.teamService.fetchAllTeams().then((team) => team);
