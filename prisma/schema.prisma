@@ -33,7 +33,7 @@ model Team {
 model Player {
   id         Int          @id @default(autoincrement())
   name       String       @unique
-  teamId     Int
+  teamId     Int?
   createdAt  DateTime     @default(now())
   team       Team?        @relation(fields: [teamId], references: [id])
   matchStats MatchStats[]

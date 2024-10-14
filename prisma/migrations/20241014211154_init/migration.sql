@@ -25,7 +25,7 @@ CREATE TABLE "Team" (
 CREATE TABLE "Player" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "teamId" INTEGER NOT NULL,
+    "teamId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Player_pkey" PRIMARY KEY ("id")
@@ -116,7 +116,7 @@ CREATE UNIQUE INDEX "_TeamToTournament_AB_unique" ON "_TeamToTournament"("A", "B
 CREATE INDEX "_TeamToTournament_B_index" ON "_TeamToTournament"("B");
 
 -- AddForeignKey
-ALTER TABLE "Player" ADD CONSTRAINT "Player_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Player" ADD CONSTRAINT "Player_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Match" ADD CONSTRAINT "Match_tournamentId_fkey" FOREIGN KEY ("tournamentId") REFERENCES "Tournament"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

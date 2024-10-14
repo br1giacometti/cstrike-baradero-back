@@ -35,6 +35,14 @@ export default class PlayerService {
     return await this.repository.delete(playerId);
   }
 
+  async disconnectPlayer(playerId: number): Promise<Player> {
+    return await this.repository.disconnectTeamPlayer(playerId);
+  }
+
+  async connectPlayer(playerId: number, teamId: number): Promise<Player> {
+    return await this.repository.connectTeamPlayer(playerId, teamId);
+  }
+
   async findPlayerByDescription(description: string): Promise<Player> {
     const player = await this.repository.findPlayerByDescription(description);
     this.validator.validateExistingPlayer(player);

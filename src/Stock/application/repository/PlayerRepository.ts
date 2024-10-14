@@ -12,4 +12,10 @@ export default abstract class PlayerRepository extends BaseRepository<Player> {
     query: string,
     teamId?: string,
   ): Promise<[Player[], number]>;
+
+  abstract disconnectTeamPlayer: (playerId: number) => Promise<Player | null>;
+  abstract connectTeamPlayer: (
+    playerId: number,
+    teamId: number,
+  ) => Promise<Player | null>;
 }

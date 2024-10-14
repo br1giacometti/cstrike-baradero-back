@@ -103,6 +103,52 @@ export default class PlayerDataProvider implements PlayerRepository {
     return this.classMapper.mapAsync(playerEntity, PlayerEntity, Player);
   }
 
+  async disconnectTeamPlayer(id: number): Promise<Player> {
+    // Busca al jugador por su ID
+    const playerEntity = await this.client.findUnique({
+      where: { id },
+    });
+
+    // Asegúrate de que el jugador existe
+    if (!playerEntity) {
+      throw new Error('Jugador no encontrado');
+    }
+
+    // Actualiza el jugador para desconectarlo del equipo
+    const updatedPlayerEntity = await this.client.update({
+      where: { id },
+      data: {
+        team: { disconnect: true }, // Desconectar el jugador del equipo
+      },
+    });
+
+    // Mapea el jugador actualizado a la entidad deseada
+    return this.classMapper.mapAsync(updatedPlayerEntity, PlayerEntity, Player);
+  }
+
+  async connectTeamPlayer(playerId: number, teamId: number): Promise<Player> {
+    // Busca al jugador por su ID
+    const playerEntity = await this.client.findUnique({
+      where: { id: playerId },
+    });
+
+    // Asegúrate de que el jugador existe
+    if (!playerEntity) {
+      throw new Error('Jugador no encontrado');
+    }
+
+    // Actualiza el jugador para conectarlo al equipo
+    const updatedPlayerEntity = await this.client.update({
+      where: { id: playerId },
+      data: {
+        team: { connect: { id: teamId } }, // Conectar el jugador al equipo
+      },
+    });
+
+    // Mapea el jugador actualizado a la entidad deseada
+    return this.classMapper.mapAsync(updatedPlayerEntity, PlayerEntity, Player);
+  }
+
   async update(id: number, partialPlayer: Partial<Player>): Promise<Player> {
     try {
       const playerEntity = await this.client.update({

@@ -160,4 +160,39 @@ export default class PlayerController {
         }
       });
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/disconnect/:playerId')
+  async disconnectTeamPlayer(
+    @Param('playerId') playerId: string,
+  ): Promise<boolean> {
+    return this.playerService
+      .disconnectPlayer(parseInt(playerId)) // Llama a tu método de servicio que se encarga de eliminar el jugador
+      .then((playerDeleted) => !!playerDeleted)
+      .catch((error) => {
+        switch (error.name) {
+          default: {
+            throw new HttpException(error.message, 500);
+          }
+        }
+      });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/connect/:playerId/:teamId')
+  async connectTeamPlayer(
+    @Param('playerId') playerId: string,
+    @Param('teamId') teamId: string,
+  ): Promise<boolean> {
+    return this.playerService
+      .connectPlayer(parseInt(playerId), parseInt(teamId))
+      .then(() => true)
+      .catch((error) => {
+        switch (error.name) {
+          default: {
+            throw new HttpException(error.message, 500);
+          }
+        }
+      });
+  }
 }
