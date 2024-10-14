@@ -87,7 +87,6 @@ export default class MatchController {
   }
 
   @Get('/:id')
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Match, MatchDto))
   async getMatchById(
     @Param('id') matchId: string,
@@ -115,7 +114,6 @@ export default class MatchController {
   }
 
   @Get('/filter/:matchid/:teamid')
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Match, MatchDto, { isArray: true }))
   async getAllMatchById(
     @Param('matchid') matchId: string,
