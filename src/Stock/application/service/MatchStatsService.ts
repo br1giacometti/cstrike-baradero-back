@@ -44,6 +44,11 @@ export default class MatchStatsService {
     return matchstats;
   }
 
+  async fetchTop10Players(): Promise<MatchStats[]> {
+    const matchstats = await this.repository.findAll();
+    return matchstats;
+  }
+
   async fetchAllMatchStatss(): Promise<MatchStats[]> {
     const matchstats = await this.repository.findAll();
     return matchstats;

@@ -103,10 +103,26 @@ export default class MatchStatsDataProvider implements MatchStatsRepository {
 
   async findAll(): Promise<MatchStats[]> {
     const matchstatss = await this.client.findMany({
-      include: { team: true },
+      include: { team: true, player: true },
       orderBy: {
         kills: 'desc', // Ordenar por descripción en orden ascendente
       },
+    });
+
+    return this.classMapper.mapArrayAsync(
+      matchstatss,
+      MatchStatsEntity,
+      MatchStats,
+    );
+  }
+
+  async findTop10Players(): Promise<MatchStats[]> {
+    const matchstatss = await this.client.findMany({
+      include: { team: true, player: true },
+      orderBy: {
+        kills: 'desc', // Ordenar por descripción en orden ascendente
+      },
+      take: 10,
     });
 
     return this.classMapper.mapArrayAsync(

@@ -34,11 +34,18 @@ export default class MatchStatsController {
   ) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(MatchStats, MatchStatsDto, { isArray: true }))
   async getAllMatchStatss(): Promise<MatchStatsDto[]> {
     return this.matchstatsService
       .fetchAllMatchStatss()
+      .then((matchstatss) => matchstatss);
+  }
+
+  @Get('/top10')
+  @UseInterceptors(MapInterceptor(MatchStats, MatchStatsDto, { isArray: true }))
+  async getTop10Players(): Promise<MatchStatsDto[]> {
+    return this.matchstatsService
+      .fetchTop10Players()
       .then((matchstatss) => matchstatss);
   }
 
