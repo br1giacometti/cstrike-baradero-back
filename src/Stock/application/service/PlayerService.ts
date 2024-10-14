@@ -72,6 +72,10 @@ export default class PlayerService {
     const players = await this.repository.findAll();
     return players;
   }
+  async fetchAllPlayersNoTeam(): Promise<Player[]> {
+    const players = await this.repository.findAllNoTeam();
+    return players;
+  }
 
   async getAllPagination(
     page: number,

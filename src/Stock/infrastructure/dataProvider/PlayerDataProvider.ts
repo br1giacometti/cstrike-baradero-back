@@ -97,6 +97,21 @@ export default class PlayerDataProvider implements PlayerRepository {
     return this.classMapper.mapArrayAsync(players, PlayerEntity, Player);
   }
 
+  async findAllNoTeam(): Promise<Player[]> {
+    const players = await this.client.findMany({
+      where: {
+        team: {
+          is: null, // Filtrar jugadores que no tienen un equipo
+        },
+      },
+      orderBy: {
+        name: 'asc', // Ordenar por nombre en orden ascendente
+      },
+    });
+
+    return this.classMapper.mapArrayAsync(players, PlayerEntity, Player);
+  }
+
   async delete(id: number): Promise<Player> {
     const playerEntity = await this.client.delete({ where: { id } });
 

@@ -40,6 +40,15 @@ export default class PlayerController {
     return this.playerService.fetchAllPlayers().then((players) => players);
   }
 
+  @Get('/noteam')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(MapInterceptor(Player, PlayerDto, { isArray: true }))
+  async getAllPlayersNoTeam(): Promise<PlayerDto[]> {
+    return this.playerService
+      .fetchAllPlayersNoTeam()
+      .then((players) => players);
+  }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(JwtAuthGuard)
   @Get('/pagination')

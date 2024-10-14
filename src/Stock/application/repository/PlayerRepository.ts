@@ -18,4 +18,6 @@ export default abstract class PlayerRepository extends BaseRepository<Player> {
     playerId: number,
     teamId: number,
   ) => Promise<Player | null>;
+
+  abstract findAllNoTeam: () => Promise<Player[]>;
 }
