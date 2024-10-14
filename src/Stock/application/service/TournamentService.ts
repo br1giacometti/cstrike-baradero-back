@@ -73,7 +73,7 @@ export default class TournamentService {
     return tournament;
   }
 
-  async getPointsByTournamentId(tournamentId: number): Promise<
+  async getPointsByTournamentId(): Promise<
     Array<{
       idEquipo: number;
       nombreEquipo: string;
@@ -82,9 +82,7 @@ export default class TournamentService {
       puntuacionTotal: number;
     }>
   > {
-    const tournament = await this.repository.getPointsByTournamentId(
-      tournamentId,
-    );
+    const tournament = await this.repository.getPointsByTournamentId();
 
     return tournament;
   }

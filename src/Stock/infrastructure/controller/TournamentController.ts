@@ -128,12 +128,9 @@ export default class TournamentController {
       });
   }
 
-  @Get('/:id/points')
+  @Get('/points/:id')
   @UseGuards(JwtAuthGuard)
-  async getPointsByTournamentId(
-    @Param('id') tournamentId: string,
-    @I18n() i18n: I18nContext,
-  ): Promise<
+  async getPointsByTournamentId(@I18n() i18n: I18nContext): Promise<
     Array<{
       idEquipo: number;
       nombreEquipo: string;
@@ -143,7 +140,7 @@ export default class TournamentController {
     }>
   > {
     return this.tournamentService
-      .getPointsByTournamentId(parseInt(tournamentId))
+      .getPointsByTournamentId()
       .then((points) => points)
       .catch((error) => {
         switch (error.name) {

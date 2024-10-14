@@ -64,75 +64,6 @@ export default class TournamentDataProvider implements TournamentRepository {
     }
   }
 
-  async getPointsByTournamentId(tournamentId: number): Promise<
-    Array<{
-      idEquipo: number;
-      nombreEquipo: string;
-      victoriasTotales: number;
-      derrotasTotales: number;
-      puntuacionTotal: number;
-    }>
-  > {
-    // Obtener el torneo y los partidos
-    const tournamentEntity = await this.client.findUnique({
-      where: { id: tournamentId },
-      include: {
-        teams: true,
-        matches: true,
-      },
-    });
-
-    // Verificar si el torneo existe
-    if (!tournamentEntity) {
-      throw new Error('Tournament not found');
-    }
-
-    // Inicializar un mapa para almacenar estadísticas de equipos
-    const teamStats = new Map<
-      number,
-      { wins: number; losses: number; points: number }
-    >();
-
-    // Inicializar las estadísticas para cada equipo
-    for (const team of tournamentEntity.teams) {
-      teamStats.set(team.id, { wins: 0, losses: 0, points: 0 });
-    }
-
-    // Recorrer los partidos y calcular puntos
-    for (const match of tournamentEntity.matches) {
-      const { resultTeamA, resultTeamB, teamAId, teamBId } = match;
-
-      if (resultTeamA > resultTeamB) {
-        // Equipo A gana
-        teamStats.get(teamAId)!.wins++;
-        teamStats.get(teamAId)!.points += 3; // Ganador recibe 3 puntos
-        teamStats.get(teamBId)!.losses++;
-      } else if (resultTeamA < resultTeamB) {
-        // Equipo B gana
-        teamStats.get(teamBId)!.wins++;
-        teamStats.get(teamBId)!.points += 3; // Ganador recibe 3 puntos
-        teamStats.get(teamAId)!.losses++;
-      } else {
-        // No hay empates según tu lógica
-        continue;
-      }
-    }
-
-    // Crear el resultado final
-    const result = tournamentEntity.teams.map((team) => {
-      const stats = teamStats.get(team.id);
-      return {
-        idEquipo: team.id,
-        nombreEquipo: team.name,
-        victoriasTotales: stats!.wins,
-        derrotasTotales: stats!.losses,
-        puntuacionTotal: stats!.points,
-      };
-    });
-
-    return result;
-  }
-
   async findById(id: number): Promise<Tournament | null> {
     const tournamentEntity = await this.client.findUnique({
       where: { id },
@@ -230,6 +161,88 @@ export default class TournamentDataProvider implements TournamentRepository {
       TournamentEntity,
       Tournament,
     );
+  }
+
+  async getPointsByTournamentId(): Promise<
+    Array<{
+      idEquipo: number;
+      nombreEquipo: string;
+      victoriasTotales: number;
+      derrotasTotales: number;
+      puntuacionTotal: number;
+    }>
+  > {
+    const tournaments = await this.client.findMany({
+      where: {
+        isActive: true, // Filtrar solo torneos activos
+      },
+      include: {
+        teams: true,
+        matches: {
+          include: {
+            teamA: { include: { players: true } }, // Incluye jugadores del equipo A
+            teamB: { include: { players: true } }, // Incluye jugadores del equipo B
+          },
+        },
+        MatchDay: true,
+      },
+      orderBy: {
+        createdAt: 'asc', // Ordenar por createdAt en orden ascendente para obtener el más viejo
+      },
+      take: 1,
+    });
+
+    // Verificar si hay torneos activos
+    if (tournaments.length === 0) {
+      throw new Error('No active tournaments found');
+    }
+
+    const tournamentEntity = tournaments[0]; // Tomar el primer torneo
+
+    // Inicializar un mapa para almacenar estadísticas de equipos
+    const teamStats = new Map<
+      number,
+      { wins: number; losses: number; points: number }
+    >();
+
+    // Inicializar las estadísticas para cada equipo
+    for (const team of tournamentEntity.teams) {
+      teamStats.set(team.id, { wins: 0, losses: 0, points: 0 });
+    }
+
+    // Recorrer los partidos y calcular puntos
+    for (const match of tournamentEntity.matches) {
+      const { resultTeamA, resultTeamB, teamAId, teamBId } = match;
+
+      if (resultTeamA > resultTeamB) {
+        // Equipo A gana
+        teamStats.get(teamAId)!.wins++;
+        teamStats.get(teamAId)!.points += 3; // Ganador recibe 3 puntos
+        teamStats.get(teamBId)!.losses++;
+      } else if (resultTeamA < resultTeamB) {
+        // Equipo B gana
+        teamStats.get(teamBId)!.wins++;
+        teamStats.get(teamBId)!.points += 3; // Ganador recibe 3 puntos
+        teamStats.get(teamAId)!.losses++;
+      } else {
+        // No hay empates según tu lógica
+        continue;
+      }
+    }
+
+    // Crear el resultado final
+    const result = tournamentEntity.teams.map((team) => {
+      const stats = teamStats.get(team.id) || { wins: 0, losses: 0, points: 0 };
+      return {
+        idEquipo: team.id,
+        nombreEquipo: team.name,
+        victoriasTotales: stats.wins,
+        derrotasTotales: stats.losses,
+        puntuacionTotal: stats.points,
+      };
+    });
+
+    return result;
   }
 
   async findFixture(): Promise<Tournament[]> {
