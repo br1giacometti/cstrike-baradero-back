@@ -238,7 +238,12 @@ export default class TournamentDataProvider implements TournamentRepository {
         isActive: true, // Filtrar solo torneos activos
       },
       include: {
-        matches: { include: { teamA: true, teamB: true } },
+        matches: {
+          include: {
+            teamA: { include: { players: true } },
+            teamB: { include: { players: true } },
+          },
+        },
         MatchDay: true,
       },
       orderBy: {
