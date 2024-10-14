@@ -6,15 +6,16 @@ export default abstract class TournamentRepository extends BaseRepository<Tourna
     description: string,
   ) => Promise<Tournament | null>;
   abstract validateTournamentsIds(ids: number[]): Promise<Tournament[] | null>;
+
+  abstract findFixture: () => Promise<Tournament[]>;
+
   abstract findAndCountWithQuery(
     skip: number,
     take: number,
     query: string,
     categoryId?: string,
   ): Promise<[Tournament[], number]>;
-  abstract getPointsByTournamentId(
-    tournamentId: number,
-  ): Promise<
+  abstract getPointsByTournamentId(tournamentId: number): Promise<
     Array<{
       idEquipo: number;
       nombreEquipo: string;

@@ -94,6 +94,11 @@ export default class TournamentService {
     return tournaments;
   }
 
+  async fetchFixtureActiveTournament(): Promise<Tournament[]> {
+    const tournaments = await this.repository.findFixture();
+    return tournaments;
+  }
+
   async getAllPagination(
     page: number,
     limit: number,

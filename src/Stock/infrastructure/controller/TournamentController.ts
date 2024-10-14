@@ -42,6 +42,13 @@ export default class TournamentController {
       .then((tournaments) => tournaments);
   }
 
+  @Get('/fixture')
+  async getLastAtiveTournaments(): Promise<TournamentDto[]> {
+    return this.tournamentService
+      .fetchFixtureActiveTournament()
+      .then((tournaments) => tournaments);
+  }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(JwtAuthGuard)
   @Get('/pagination')

@@ -203,6 +203,9 @@ export default class TournamentDataProvider implements TournamentRepository {
 
   async findAll(): Promise<Tournament[]> {
     const tournaments = await this.client.findMany({
+      where: {
+        isActive: true, // Filtrar solo torneos activos
+      },
       include: {
         teams: true,
         matches: {
@@ -218,8 +221,30 @@ export default class TournamentDataProvider implements TournamentRepository {
         scoreTables: true,
       },
       orderBy: {
-        createdAt: 'desc', // Ordenar por createdAt en orden descendente
+        createdAt: 'desc', // Ordenar por createdAt en orden ascendente para obtener el más viejo
       },
+    });
+
+    return this.classMapper.mapArrayAsync(
+      tournaments,
+      TournamentEntity,
+      Tournament,
+    );
+  }
+
+  async findFixture(): Promise<Tournament[]> {
+    const tournaments = await this.client.findMany({
+      where: {
+        isActive: true, // Filtrar solo torneos activos
+      },
+      include: {
+        matches: { include: { teamA: true, teamB: true } },
+        MatchDay: true,
+      },
+      orderBy: {
+        createdAt: 'asc', // Ordenar por createdAt en orden ascendente para obtener el más viejo
+      },
+      take: 1,
     });
 
     return this.classMapper.mapArrayAsync(
