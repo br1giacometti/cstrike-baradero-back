@@ -2,6 +2,7 @@ import { AutoMap } from '@automapper/classes';
 import { z } from 'zod';
 import Team from 'Stock/domain/models/Team';
 import CreateTournamentSchema from 'Stock/infrastructure/schema/CreateTournamentSchema';
+import { TournamentStage } from 'Stock/domain/models/TournamentStage';
 
 export class CreateTournamentDto {
   @AutoMap()
@@ -9,6 +10,9 @@ export class CreateTournamentDto {
 
   @AutoMap()
   name: string;
+
+  @AutoMap()
+  status: TournamentStage;
 
   @AutoMap()
   isActive?: Boolean;

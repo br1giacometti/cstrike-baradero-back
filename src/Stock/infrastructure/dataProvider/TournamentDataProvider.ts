@@ -10,6 +10,7 @@ import TournamentRepository from 'Stock/application/repository/TournamentReposit
 import TournamentNotFoundException from 'Stock/application/exception/TournamentNotFoundException';
 import Tournament from 'Stock/domain/models/Tournament';
 import TournamentEntity from '../entity/TournamentEntity';
+import { TournamentStage } from 'Stock/domain/models/TournamentStage';
 
 @Injectable()
 export default class TournamentDataProvider implements TournamentRepository {
@@ -96,6 +97,26 @@ export default class TournamentDataProvider implements TournamentRepository {
     );
   }
 
+  async findStatusId(): Promise<TournamentStage | null> {
+    const tournament = await this.client.findFirst({
+      where: {
+        isActive: true, // Filtrar solo torneos activos
+      },
+      select: {
+        status: true, // Solo traemos el campo 'status'
+      },
+      orderBy: {
+        createdAt: 'asc', // Ordenar por createdAt en orden ascendente
+      },
+    });
+
+    if (!tournament) {
+      return null; // Retornar null si no hay torneo activo
+    }
+
+    return tournament.status as TournamentStage; // Type assertion para resolver el conflicto
+  }
+
   async findAndCountWithQuery(
     skip: number,
     take: number,
@@ -174,63 +195,74 @@ export default class TournamentDataProvider implements TournamentRepository {
   > {
     const tournaments = await this.client.findMany({
       where: {
-        isActive: true, // Filtrar solo torneos activos
+        isActive: true,
       },
       include: {
         teams: true,
         matches: {
           include: {
-            teamA: { include: { players: true } }, // Incluye jugadores del equipo A
-            teamB: { include: { players: true } }, // Incluye jugadores del equipo B
+            teamA: { include: { players: true } },
+            teamB: { include: { players: true } },
           },
         },
         MatchDay: true,
       },
       orderBy: {
-        createdAt: 'asc', // Ordenar por createdAt en orden ascendente para obtener el más viejo
+        createdAt: 'asc',
       },
       take: 1,
     });
 
-    // Verificar si hay torneos activos
     if (tournaments.length === 0) {
       throw new Error('No active tournaments found');
     }
 
-    const tournamentEntity = tournaments[0]; // Tomar el primer torneo
-
-    // Inicializar un mapa para almacenar estadísticas de equipos
+    const tournamentEntity = tournaments[0];
     const teamStats = new Map<
       number,
       { wins: number; losses: number; points: number }
     >();
 
-    // Inicializar las estadísticas para cada equipo
     for (const team of tournamentEntity.teams) {
       teamStats.set(team.id, { wins: 0, losses: 0, points: 0 });
     }
 
-    // Recorrer los partidos y calcular puntos
     for (const match of tournamentEntity.matches) {
       const { resultTeamA, resultTeamB, teamAId, teamBId } = match;
 
       if (resultTeamA > resultTeamB) {
         // Equipo A gana
         teamStats.get(teamAId)!.wins++;
-        teamStats.get(teamAId)!.points += 3; // Ganador recibe 3 puntos
+        if (resultTeamA === 16) {
+          // Gana con 16 puntos
+          teamStats.get(teamAId)!.points += 3; // 3 puntos
+        } else if (resultTeamA > 17) {
+          // Gana con más de 17 puntos
+          teamStats.get(teamAId)!.points += 2; // 2 puntos
+        }
         teamStats.get(teamBId)!.losses++;
+        if (resultTeamB > 12 || resultTeamB >= 15) {
+          // Si el perdedor tiene más de 12 o 15 puntos
+          teamStats.get(teamBId)!.points += 1; // 1 punto
+        }
       } else if (resultTeamA < resultTeamB) {
         // Equipo B gana
         teamStats.get(teamBId)!.wins++;
-        teamStats.get(teamBId)!.points += 3; // Ganador recibe 3 puntos
+        if (resultTeamB === 16) {
+          // Gana con 16 puntos
+          teamStats.get(teamBId)!.points += 3; // 3 puntos
+        } else if (resultTeamB > 17) {
+          // Gana con más de 17 puntos
+          teamStats.get(teamBId)!.points += 2; // 2 puntos
+        }
         teamStats.get(teamAId)!.losses++;
-      } else {
-        // No hay empates según tu lógica
-        continue;
+        if (resultTeamA > 12 || resultTeamA >= 15) {
+          // Si el perdedor tiene más de 12 o 15 puntos
+          teamStats.get(teamAId)!.points += 1; // 1 punto
+        }
       }
     }
 
-    // Crear el resultado final
     const result = tournamentEntity.teams.map((team) => {
       const stats = teamStats.get(team.id) || { wins: 0, losses: 0, points: 0 };
       return {
@@ -242,7 +274,7 @@ export default class TournamentDataProvider implements TournamentRepository {
       };
     });
 
-    return result;
+    return result.sort((a, b) => b.puntuacionTotal - a.puntuacionTotal);
   }
 
   async findFixture(): Promise<Tournament[]> {
@@ -291,6 +323,7 @@ export default class TournamentDataProvider implements TournamentRepository {
         where: { id },
         data: {
           name: partialTournament.name,
+          status: partialTournament.status,
         },
         include: { teams: true, matches: true, scoreTables: true },
       });

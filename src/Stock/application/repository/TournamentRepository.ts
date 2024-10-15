@@ -1,5 +1,6 @@
 import BaseRepository from 'Base/repository/BaseRepository';
 import Tournament from 'Stock/domain/models/Tournament';
+import { TournamentStage } from 'Stock/domain/models/TournamentStage';
 
 export default abstract class TournamentRepository extends BaseRepository<Tournament> {
   abstract findTournamentByDescription: (
@@ -24,4 +25,6 @@ export default abstract class TournamentRepository extends BaseRepository<Tourna
       puntuacionTotal: number;
     }>
   >;
+
+  abstract findStatusId: () => Promise<TournamentStage>;
 }

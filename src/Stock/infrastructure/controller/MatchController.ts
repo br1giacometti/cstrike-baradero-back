@@ -141,7 +141,6 @@ export default class MatchController {
       });
   }
   @Patch('/:id')
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(MapInterceptor(Match, MatchDto))
   async updateMatch(
     @Body() matchDto: UpdateMatchDto, // Se asegura de que sea UpdateMatchDto

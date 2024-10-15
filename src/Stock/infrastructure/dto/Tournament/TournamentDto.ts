@@ -3,6 +3,7 @@ import Match from 'Stock/domain/models/Match';
 import MatchDay from 'Stock/domain/models/MatchDay';
 import ScoreTable from 'Stock/domain/models/ScoreTable';
 import Team from 'Stock/domain/models/Team';
+import { TournamentStage } from 'Stock/domain/models/TournamentStage';
 
 export class TournamentDto {
   @AutoMap()
@@ -28,4 +29,7 @@ export class TournamentDto {
 
   @AutoMap(() => [MatchDay]) // Mapea MatchDay correctamente
   MatchDay?: MatchDay[];
+
+  @AutoMap()
+  status: TournamentStage;
 }

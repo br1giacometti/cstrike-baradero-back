@@ -185,6 +185,38 @@ export default class TournamentController {
       });
   }
 
+  @Patch('/updatestage/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(MapInterceptor(Tournament, TournamentDto))
+  async updateTournamentStage(
+    @Body() tournamentDto: TournamentDto,
+    @Param('id') tournamentId: string,
+    @I18n() i18n: I18nContext,
+  ): Promise<TournamentDto> {
+    return this.tournamentService
+      .updateTournamentStage(
+        parseInt(tournamentId),
+        await this.classMapper.mapAsync(
+          tournamentDto, // No necesitas cambiar esto
+          TournamentDto, // Cambia a TournamentDto
+          Tournament, // El modelo de destino sigue siendo Tournament
+        ),
+      )
+      .then((tournament) => tournament)
+      .catch((error) => {
+        switch (error.name) {
+          case 'TournamentDescriptionAlreadyInUseException':
+            throw new HttpException(i18n.t(error.message), 404);
+          case 'TournamentSkuAlreadyInUseException':
+            throw new HttpException(i18n.t(error.message), 404);
+          case 'TournamentNotFoundException':
+            throw new HttpException(i18n.t(error.message), 404);
+          default:
+            throw new HttpException(error.message, 500);
+        }
+      });
+  }
+
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async deleteTournament(@Param('id') tournamentId: string): Promise<boolean> {

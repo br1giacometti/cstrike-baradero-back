@@ -5,6 +5,7 @@ import MatchEntity from './MatchEntity';
 import ScoreTableEntity from './ScoreTableEntity';
 import MatchDay from 'Stock/domain/models/MatchDay';
 import MatchDayEntity from './MatchDayEntity';
+import { TournamentStage } from 'Stock/domain/models/TournamentStage';
 
 class TournamentEntity implements ITournamentEntity {
   @AutoMap()
@@ -15,6 +16,8 @@ class TournamentEntity implements ITournamentEntity {
 
   @AutoMap()
   startDate: Date;
+  @AutoMap()
+  status: TournamentStage;
 
   @AutoMap()
   isActive: boolean;

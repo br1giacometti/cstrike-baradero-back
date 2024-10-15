@@ -5,18 +5,22 @@ import Tournament from '../../domain/models/Tournament';
 import PaginationMetaDto from 'Base/dto/PaginationMetaDto';
 import TournamentRepository from '../repository/TournamentRepository';
 import TournamentValidations from '../validations/TournamentValidations';
+import MatchDayService from './MatchDayService';
+import MatchDay from 'Stock/domain/models/MatchDay';
 
 @Injectable()
 export default class TournamentService {
   constructor(
     private readonly repository: TournamentRepository,
     private readonly validator: TournamentValidations,
+    private readonly matchDayService: MatchDayService,
   ) {}
 
   async createTournament(tournament: Tournament): Promise<Tournament> {
     const tournamentCreated = await this.repository.insert({
       name: tournament.name,
       matches: tournament.matches,
+      status: tournament.status,
       scoreTables: tournament.scoreTables,
       startDate: tournament.startDate,
       teams: tournament.teams,
@@ -39,6 +43,46 @@ export default class TournamentService {
       scoreTables: tournament.scoreTables,
       teams: tournament.teams,
     });
+    return tournamentUpdated;
+  }
+
+  async updateTournamentStage(
+    idTournament: number,
+    tournament: Tournament,
+  ): Promise<Tournament> {
+    if (tournament.status === 'SEMIFINALS') {
+      const topTeams = await this.repository.getPointsByTournamentId();
+
+      // Separar los equipos en dos enfrentamientos
+      const semiFinal1 = {
+        teamAId: topTeams[0].idEquipo, // 1º lugar
+        teamBId: topTeams[3].idEquipo, // 4º lugar
+      };
+
+      const semiFinal2 = {
+        teamAId: topTeams[1].idEquipo, // 2º lugar
+        teamBId: topTeams[2].idEquipo, // 3º lugar
+      };
+
+      const firstMatchDay = new MatchDay(idTournament, 'Semi Finales 1');
+
+      await this.matchDayService.createMatchDayStage(
+        firstMatchDay,
+        semiFinal1,
+        'Semifinal 1',
+      );
+
+      await this.matchDayService.createMatchDayStage(
+        firstMatchDay,
+        semiFinal2,
+        'Semifinal 2',
+      );
+    }
+
+    const tournamentUpdated = await this.repository.update(idTournament, {
+      status: tournament.status,
+    });
+
     return tournamentUpdated;
   }
 
@@ -89,6 +133,7 @@ export default class TournamentService {
 
   async fetchAllTournaments(): Promise<Tournament[]> {
     const tournaments = await this.repository.findAll();
+    console.log(await this.repository.findStatusId());
     return tournaments;
   }
 

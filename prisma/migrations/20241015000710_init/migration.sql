@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "TournamentStage" AS ENUM ('GROUP_STAGE', 'SEMIFINALS', 'THIRD_PLACE', 'FINAL', 'COMPLETED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -38,6 +41,7 @@ CREATE TABLE "Tournament" (
     "isActive" BOOLEAN DEFAULT true,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3),
+    "status" "TournamentStage" NOT NULL DEFAULT 'GROUP_STAGE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Tournament_pkey" PRIMARY KEY ("id")

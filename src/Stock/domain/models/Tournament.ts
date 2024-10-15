@@ -3,6 +3,7 @@ import Team from './Team';
 import ScoreTable from './ScoreTable';
 import Match from './Match';
 import MatchDay from './MatchDay';
+import { TournamentStage } from './TournamentStage'; // Importar el enum
 
 export default class Tournament {
   @AutoMap()
@@ -23,11 +24,16 @@ export default class Tournament {
   @AutoMap(() => [ScoreTable]) // Array de ScoreTable
   scoreTables: ScoreTable[];
 
+  // Nuevo campo status con el enum TournamentStage
+  @AutoMap()
+  status: TournamentStage;
+
   @AutoMap()
   endDate?: Date;
 
   @AutoMap()
   createdAt: Date;
+
   @AutoMap(() => [MatchDay])
   MatchDay?: MatchDay[];
 
@@ -37,6 +43,7 @@ export default class Tournament {
   constructor(
     name: string,
     startDate: Date,
+    status: TournamentStage = TournamentStage.GROUP_STAGE, // Estado inicial predeterminado
     teams?: Team[],
     id?: number,
     endDate?: Date,
@@ -45,9 +52,10 @@ export default class Tournament {
     MatchDay?: MatchDay[],
     isActive?: Boolean,
   ) {
-    this.id = id; // Asignar 0 si no se proporciona id
+    this.id = id;
     this.name = name;
     this.startDate = startDate;
+    this.status = status; // Inicializamos el estado con el enum
     this.endDate = endDate;
     this.teams = teams || [];
     this.matches = matches || [];

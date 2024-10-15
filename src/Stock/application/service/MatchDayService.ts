@@ -36,6 +36,32 @@ export default class MatchDayService {
 
     return matchdayCreated; // Devuelve el MatchDay creado
   }
+
+  async createMatchDayStage(
+    matchday: MatchDay,
+    semiFinal: { teamAId: number; teamBId: number },
+    nameSemifinal: string,
+  ): Promise<MatchDay> {
+    // Crear el MatchDay
+
+    const matchdayCreated = await this.repository.insert({
+      tournamentId: matchday.tournamentId,
+      name: nameSemifinal,
+      id: matchday.id,
+    });
+
+    // Crear el Match asociado
+    await this.serviceMatch.createMatch({
+      tournamentId: matchday.tournamentId,
+      teamAId: semiFinal.teamAId,
+      teamBId: semiFinal.teamBId,
+      matchDayId: matchdayCreated.id, // Asocia el Match con el MatchDay recién creado
+      id: matchday.id, // Puedes generar un nuevo ID o usar el del matchday, dependiendo de tu lógica
+    });
+
+    return matchdayCreated; // Devuelve el MatchDay creado
+  }
+
   async updateMatchDay(id: number, matchdaystats: MatchDay): Promise<MatchDay> {
     const matchdaystatsCreated = await this.repository.update(id, {
       name: matchdaystats.name,

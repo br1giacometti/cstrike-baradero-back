@@ -39,16 +39,25 @@ model Player {
   matchStats MatchStats[]
 }
 
+enum TournamentStage {
+  GROUP_STAGE // Rondas iniciales (todos vs todos)
+  SEMIFINALS // Semifinales basadas en la tabla
+  THIRD_PLACE // Partido por el tercer y cuarto puesto
+  FINAL // Partido final para definir al campeón
+  COMPLETED // Torneo finalizado
+}
+
 model Tournament {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  isActive    Boolean?     @default(true)
+  id          Int             @id @default(autoincrement())
+  name        String          @unique
+  isActive    Boolean?        @default(true)
   startDate   DateTime
   endDate     DateTime?
+  status      TournamentStage @default(GROUP_STAGE)
   teams       Team[] // Relación implícita muchos a muchos
   matches     Match[] // Relación implícita muchos a muchos
   scoreTables ScoreTable[]
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime        @default(now())
   MatchDay    MatchDay[]
 }
 
