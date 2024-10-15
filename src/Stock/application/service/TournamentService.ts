@@ -77,6 +77,54 @@ export default class TournamentService {
         semiFinal2,
         'Semifinal 2',
       );
+
+      // Aquí podrías actualizar el estado del torneo a SEMIFINALS
+      await this.repository.update(idTournament, {
+        status: tournament.status,
+      });
+    } else if (tournament.status === 'FINAL') {
+      // Obtener los resultados de las semifinales
+      const semiFinalResults = await this.repository.getSemiFinalResults(
+        idTournament,
+      );
+
+      // Supongamos que semiFinalResults devuelve algo como:
+      // [{ teamAId: x, teamBId: y, resultA: scoreA, resultB: scoreB }, ...]
+
+      const winner1 =
+        semiFinalResults[0].resultA > semiFinalResults[0].resultB
+          ? semiFinalResults[0].teamAId
+          : semiFinalResults[0].teamBId;
+      const loser1 =
+        semiFinalResults[0].resultA > semiFinalResults[0].resultB
+          ? semiFinalResults[0].teamBId
+          : semiFinalResults[0].teamAId;
+
+      const winner2 =
+        semiFinalResults[1].resultA > semiFinalResults[1].resultB
+          ? semiFinalResults[1].teamAId
+          : semiFinalResults[1].teamBId;
+      const loser2 =
+        semiFinalResults[1].resultA > semiFinalResults[1].resultB
+          ? semiFinalResults[1].teamBId
+          : semiFinalResults[1].teamAId;
+
+      // Crear partidos para la final y tercer puesto
+      const finalMatchDay = new MatchDay(idTournament, 'Finales');
+
+      // Partido Final
+      await this.matchDayService.createMatchDayStage(
+        finalMatchDay,
+        { teamAId: winner1, teamBId: winner2 },
+        'Partido Final',
+      );
+
+      // Partido por el tercer y cuarto puesto
+      await this.matchDayService.createMatchDayStage(
+        finalMatchDay,
+        { teamAId: loser1, teamBId: loser2 },
+        'Tercer y Cuarto Puesto',
+      );
     }
 
     const tournamentUpdated = await this.repository.update(idTournament, {
@@ -133,7 +181,19 @@ export default class TournamentService {
 
   async fetchAllTournaments(): Promise<Tournament[]> {
     const tournaments = await this.repository.findAll();
-    console.log(await this.repository.findStatusId());
+
+    return tournaments;
+  }
+
+  async getSemiResults(): Promise<
+    Array<{
+      teamAId: number;
+      teamBId: number;
+      resultA: number;
+      resultB: number;
+    }>
+  > {
+    const tournaments = await this.repository.getSemiFinalResults(1);
     return tournaments;
   }
 

@@ -27,4 +27,13 @@ export default abstract class TournamentRepository extends BaseRepository<Tourna
   >;
 
   abstract findStatusId: () => Promise<TournamentStage>;
+
+  abstract getSemiFinalResults(idTournament: number): Promise<
+    Array<{
+      teamAId: number;
+      teamBId: number;
+      resultA: number;
+      resultB: number;
+    }>
+  >;
 }

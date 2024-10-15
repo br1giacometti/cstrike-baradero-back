@@ -42,6 +42,18 @@ export default class TournamentController {
       .then((tournaments) => tournaments);
   }
 
+  @Get('/semiresults')
+  async getSemiResults(): Promise<
+    Array<{
+      teamAId: number;
+      teamBId: number;
+      resultA: number;
+      resultB: number;
+    }>
+  > {
+    return this.tournamentService.getSemiResults().then((points) => points);
+  }
+
   @Get('/fixture')
   async getLastAtiveTournaments(): Promise<TournamentDto[]> {
     return this.tournamentService

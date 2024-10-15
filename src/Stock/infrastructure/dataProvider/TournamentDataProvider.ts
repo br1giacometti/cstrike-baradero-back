@@ -277,6 +277,48 @@ export default class TournamentDataProvider implements TournamentRepository {
     return result.sort((a, b) => b.puntuacionTotal - a.puntuacionTotal);
   }
 
+  async getSemiFinalResults(idTournament: number): Promise<
+    Array<{
+      teamAId: number;
+      teamBId: number;
+      resultA: number;
+      resultB: number;
+    }>
+  > {
+    const tournament = await this.client.findUnique({
+      where: { id: idTournament },
+      include: {
+        matches: {
+          where: {
+            // Filtra los partidos que pertenecen a la etapa de semifinales
+            matchDay: {
+              name: {
+                in: ['Semifinal 1', 'Semifinal 2'], // Usa 'in' para filtrar por múltiples nombres
+              },
+            },
+          },
+          include: {
+            teamA: true,
+            teamB: true,
+          },
+        },
+      },
+    });
+
+    if (!tournament) {
+      throw new Error('Tournament not found');
+    }
+
+    const results = tournament.matches.map((match) => ({
+      teamAId: match.teamAId,
+      teamBId: match.teamBId,
+      resultA: match.resultTeamA,
+      resultB: match.resultTeamB,
+    }));
+
+    return results;
+  }
+
   async findFixture(): Promise<Tournament[]> {
     const tournaments = await this.client.findMany({
       where: {
