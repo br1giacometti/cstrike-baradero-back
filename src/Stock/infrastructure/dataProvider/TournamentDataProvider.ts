@@ -250,7 +250,7 @@ export default class TournamentDataProvider implements TournamentRepository {
             teamStats.get(teamAId)!.points += 2; // 2 puntos
           }
           teamStats.get(teamBId)!.losses++;
-          if (resultTeamB > 12 || resultTeamB >= 15) {
+          if (resultTeamB > 11 || resultTeamB >= 15) {
             // Si el perdedor tiene más de 12 o 15 puntos
             teamStats.get(teamBId)!.points += 1; // 1 punto
           }
@@ -265,8 +265,8 @@ export default class TournamentDataProvider implements TournamentRepository {
             teamStats.get(teamBId)!.points += 2; // 2 puntos
           }
           teamStats.get(teamAId)!.losses++;
-          if (resultTeamA > 12 || resultTeamA >= 15) {
-            // Si el perdedor tiene más de 12 o 15 puntos
+          if (resultTeamA > 11 || resultTeamA >= 15) {
+            // Si el perdedor tiene más de 11 o 15 puntos
             teamStats.get(teamAId)!.points += 1; // 1 punto
           }
         }
