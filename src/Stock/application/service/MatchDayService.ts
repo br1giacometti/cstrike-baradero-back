@@ -50,7 +50,7 @@ export default class MatchDayService {
       id: matchday.id,
     });
 
-    // Crear el Match asociado
+    // Crear el primer Match asociado
     await this.serviceMatch.createMatch({
       tournamentId: matchday.tournamentId,
       teamAId: semiFinal.teamAId,
@@ -59,6 +59,14 @@ export default class MatchDayService {
       id: matchday.id, // Puedes generar un nuevo ID o usar el del matchday, dependiendo de tu lógica
     });
 
+    // Crear el segundo Match asociado (puedes modificar teamAId y teamBId si es necesario)
+    await this.serviceMatch.createMatch({
+      tournamentId: matchday.tournamentId,
+      teamAId: semiFinal.teamAId, // Si necesitas otros equipos, cámbialo aquí
+      teamBId: semiFinal.teamBId, // Igualmente, cámbialo si es necesario
+      matchDayId: matchdayCreated.id,
+      id: matchday.id,
+    });
     return matchdayCreated; // Devuelve el MatchDay creado
   }
 

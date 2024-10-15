@@ -88,26 +88,36 @@ export default class TournamentService {
         idTournament,
       );
 
-      // Supongamos que semiFinalResults devuelve algo como:
-      // [{ teamAId: x, teamBId: y, resultA: scoreA, resultB: scoreB }, ...]
+      // Crear un objeto para llevar el conteo de victorias
+      const winsCount = {};
 
-      const winner1 =
-        semiFinalResults[0].resultA > semiFinalResults[0].resultB
-          ? semiFinalResults[0].teamAId
-          : semiFinalResults[0].teamBId;
-      const loser1 =
-        semiFinalResults[0].resultA > semiFinalResults[0].resultB
-          ? semiFinalResults[0].teamBId
-          : semiFinalResults[0].teamAId;
+      semiFinalResults.forEach((result) => {
+        // Inicializamos el conteo si no existe
+        if (!winsCount[result.teamAId]) {
+          winsCount[result.teamAId] = 0;
+        }
+        if (!winsCount[result.teamBId]) {
+          winsCount[result.teamBId] = 0;
+        }
 
-      const winner2 =
-        semiFinalResults[1].resultA > semiFinalResults[1].resultB
-          ? semiFinalResults[1].teamAId
-          : semiFinalResults[1].teamBId;
-      const loser2 =
-        semiFinalResults[1].resultA > semiFinalResults[1].resultB
-          ? semiFinalResults[1].teamBId
-          : semiFinalResults[1].teamAId;
+        // Contar victorias
+        if (result.resultA > result.resultB) {
+          winsCount[result.teamAId] += 1; // Equipo A gana
+        } else {
+          winsCount[result.teamBId] += 1; // Equipo B gana
+        }
+      });
+
+      // Obtener los IDs de los equipos
+      const teams = Object.keys(winsCount).map(Number); // Convertir las claves a números
+
+      // Ordenar equipos por victorias
+      const sortedTeams = teams.sort((a, b) => winsCount[b] - winsCount[a]);
+
+      const winner1 = sortedTeams[0]; // Ganador (más victorias)
+      const winner2 = sortedTeams[1]; // Otro finalista
+      const loser1 = sortedTeams[2]; // Perdedor (tercer puesto)
+      const loser2 = sortedTeams[3]; // Otro perdedor
 
       // Crear partidos para la final y tercer puesto
       const finalMatchDay = new MatchDay(idTournament, 'Finales');
