@@ -112,18 +112,18 @@ export default class TournamentService {
       // Crear partidos para la final y tercer puesto
       const finalMatchDay = new MatchDay(idTournament, 'Finales');
 
-      // Partido Final
-      await this.matchDayService.createMatchDayStage(
-        finalMatchDay,
-        { teamAId: winner1, teamBId: winner2 },
-        'Partido Final',
-      );
-
       // Partido por el tercer y cuarto puesto
       await this.matchDayService.createMatchDayStage(
         finalMatchDay,
         { teamAId: loser1, teamBId: loser2 },
         'Tercer y Cuarto Puesto',
+      );
+
+      // Partido Final
+      await this.matchDayService.createMatchDayStage(
+        finalMatchDay,
+        { teamAId: winner1, teamBId: winner2 },
+        'Partido Final',
       );
     }
 

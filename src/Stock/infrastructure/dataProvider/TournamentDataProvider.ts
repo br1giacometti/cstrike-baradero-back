@@ -203,6 +203,7 @@ export default class TournamentDataProvider implements TournamentRepository {
           include: {
             teamA: { include: { players: true } },
             teamB: { include: { players: true } },
+            matchDay: true,
           },
         },
         MatchDay: true,
@@ -228,37 +229,45 @@ export default class TournamentDataProvider implements TournamentRepository {
     }
 
     for (const match of tournamentEntity.matches) {
-      const { resultTeamA, resultTeamB, teamAId, teamBId } = match;
+      const { resultTeamA, resultTeamB, teamAId, teamBId, matchDay } = match;
 
-      if (resultTeamA > resultTeamB) {
-        // Equipo A gana
-        teamStats.get(teamAId)!.wins++;
-        if (resultTeamA === 16) {
-          // Gana con 16 puntos
-          teamStats.get(teamAId)!.points += 3; // 3 puntos
-        } else if (resultTeamA > 17) {
-          // Gana con más de 17 puntos
-          teamStats.get(teamAId)!.points += 2; // 2 puntos
-        }
-        teamStats.get(teamBId)!.losses++;
-        if (resultTeamB > 12 || resultTeamB >= 15) {
-          // Si el perdedor tiene más de 12 o 15 puntos
-          teamStats.get(teamBId)!.points += 1; // 1 punto
-        }
-      } else if (resultTeamA < resultTeamB) {
-        // Equipo B gana
-        teamStats.get(teamBId)!.wins++;
-        if (resultTeamB === 16) {
-          // Gana con 16 puntos
-          teamStats.get(teamBId)!.points += 3; // 3 puntos
-        } else if (resultTeamB > 17) {
-          // Gana con más de 17 puntos
-          teamStats.get(teamBId)!.points += 2; // 2 puntos
-        }
-        teamStats.get(teamAId)!.losses++;
-        if (resultTeamA > 12 || resultTeamA >= 15) {
-          // Si el perdedor tiene más de 12 o 15 puntos
-          teamStats.get(teamAId)!.points += 1; // 1 punto
+      // Verifica si el nombre de la jornada no es una de las fases finales
+      if (
+        matchDay.name !== 'Semifinal 1' &&
+        matchDay.name !== 'Semifinal 2' &&
+        matchDay.name !== 'Final' &&
+        matchDay.name !== 'Tercer y Cuarto Puesto'
+      ) {
+        if (resultTeamA > resultTeamB) {
+          // Equipo A gana
+          teamStats.get(teamAId)!.wins++;
+          if (resultTeamA === 16) {
+            // Gana con 16 puntos
+            teamStats.get(teamAId)!.points += 3; // 3 puntos
+          } else if (resultTeamA > 17) {
+            // Gana con más de 17 puntos
+            teamStats.get(teamAId)!.points += 2; // 2 puntos
+          }
+          teamStats.get(teamBId)!.losses++;
+          if (resultTeamB > 12 || resultTeamB >= 15) {
+            // Si el perdedor tiene más de 12 o 15 puntos
+            teamStats.get(teamBId)!.points += 1; // 1 punto
+          }
+        } else if (resultTeamA < resultTeamB) {
+          // Equipo B gana
+          teamStats.get(teamBId)!.wins++;
+          if (resultTeamB === 16) {
+            // Gana con 16 puntos
+            teamStats.get(teamBId)!.points += 3; // 3 puntos
+          } else if (resultTeamB > 17) {
+            // Gana con más de 17 puntos
+            teamStats.get(teamBId)!.points += 2; // 2 puntos
+          }
+          teamStats.get(teamAId)!.losses++;
+          if (resultTeamA > 12 || resultTeamA >= 15) {
+            // Si el perdedor tiene más de 12 o 15 puntos
+            teamStats.get(teamAId)!.points += 1; // 1 punto
+          }
         }
       }
     }
@@ -329,6 +338,7 @@ export default class TournamentDataProvider implements TournamentRepository {
           include: {
             teamA: { include: { players: true } },
             teamB: { include: { players: true } },
+            matchDay: true,
           },
         },
         MatchDay: true,
