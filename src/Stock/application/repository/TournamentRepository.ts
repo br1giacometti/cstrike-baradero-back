@@ -1,4 +1,5 @@
 import BaseRepository from 'Base/repository/BaseRepository';
+import MatchDay from 'Stock/domain/models/MatchDay';
 import Tournament from 'Stock/domain/models/Tournament';
 import { TournamentStage } from 'Stock/domain/models/TournamentStage';
 
@@ -8,6 +9,7 @@ export default abstract class TournamentRepository extends BaseRepository<Tourna
   ) => Promise<Tournament | null>;
   abstract validateTournamentsIds(ids: number[]): Promise<Tournament[] | null>;
 
+  abstract findNextMatchDayWithMatches: () => Promise<MatchDay[]>;
   abstract findFixture: () => Promise<Tournament[]>;
 
   abstract findAndCountWithQuery(

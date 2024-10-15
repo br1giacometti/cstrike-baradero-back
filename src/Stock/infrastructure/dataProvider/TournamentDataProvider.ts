@@ -11,6 +11,7 @@ import TournamentNotFoundException from 'Stock/application/exception/TournamentN
 import Tournament from 'Stock/domain/models/Tournament';
 import TournamentEntity from '../entity/TournamentEntity';
 import { TournamentStage } from 'Stock/domain/models/TournamentStage';
+import MatchDay from 'Stock/domain/models/MatchDay';
 
 @Injectable()
 export default class TournamentDataProvider implements TournamentRepository {
@@ -326,6 +327,39 @@ export default class TournamentDataProvider implements TournamentRepository {
     }));
 
     return results;
+  }
+
+  async findNextMatchDayWithMatches(): Promise<MatchDay[]> {
+    const tournaments = await this.client.findMany({
+      where: { isActive: true },
+      include: {
+        MatchDay: {
+          orderBy: { id: 'asc' }, // Ordenar los matchDays por id ascendente
+          include: {
+            matches: {
+              include: {
+                teamA: { include: { players: true } },
+                teamB: { include: { players: true } },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' }, // Obtener el torneo más viejo
+      take: 1,
+    });
+
+    const tournament = tournaments[0];
+    if (!tournament) return [];
+
+    // Filtrar los MatchDays que tengan al menos un partido sin jugar
+    const pendingMatchDays = tournament.MatchDay.filter((matchDay) =>
+      matchDay.matches.some(
+        (match) => match.resultTeamA === 0 && match.resultTeamB === 0,
+      ),
+    );
+
+    return pendingMatchDays; // Devolver todos los matchDays con partidos pendientes
   }
 
   async findFixture(): Promise<Tournament[]> {

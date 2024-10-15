@@ -197,6 +197,11 @@ export default class TournamentService {
     return tournaments;
   }
 
+  async fetchNextMatchDay(): Promise<MatchDay[]> {
+    const tournaments = await this.repository.findNextMatchDayWithMatches();
+    return tournaments;
+  }
+
   async fetchFixtureActiveTournament(): Promise<Tournament[]> {
     const tournaments = await this.repository.findFixture();
     return tournaments;

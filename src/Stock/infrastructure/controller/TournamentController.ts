@@ -25,6 +25,7 @@ import PaginationMetaDto from 'Base/dto/PaginationMetaDto';
 import Tournament from 'Stock/domain/models/Tournament';
 import { TournamentDto } from '../dto/Tournament/TournamentDto';
 import { CreateTournamentDto } from '../dto/Tournament/CreateTournamentDto';
+import MatchDay from 'Stock/domain/models/MatchDay';
 
 @Controller('tournament')
 export default class TournamentController {
@@ -52,6 +53,13 @@ export default class TournamentController {
     }>
   > {
     return this.tournamentService.getSemiResults().then((points) => points);
+  }
+
+  @Get('/nextmatchday')
+  async getNextMatch(): Promise<MatchDay[]> {
+    return this.tournamentService
+      .fetchNextMatchDay()
+      .then((tournaments) => tournaments);
   }
 
   @Get('/fixture')
