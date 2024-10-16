@@ -63,7 +63,7 @@ export default class TournamentController {
   }
 
   @Get('/fixture')
-  async getLastAtiveTournaments(): Promise<TournamentDto[]> {
+  async getLastAtiveTournaments(): Promise<MatchDay[]> {
     return this.tournamentService
       .fetchFixtureActiveTournament()
       .then((tournaments) => tournaments);

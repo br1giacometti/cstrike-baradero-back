@@ -62,7 +62,7 @@ model Tournament {
 }
 
 model Match {
-  id           Int    @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   tournamentId Int
   teamAId      Int
   teamBId      Int
@@ -70,6 +70,7 @@ model Match {
   resultTeamA  Int // Resultado del equipo A
   resultTeamB  Int // Resultado del equipo B
   map          String // Nombre del mapa jugado
+  winner       String?
 
   tournament Tournament   @relation(fields: [tournamentId], references: [id])
   teamA      Team         @relation("TeamA", fields: [teamAId], references: [id])

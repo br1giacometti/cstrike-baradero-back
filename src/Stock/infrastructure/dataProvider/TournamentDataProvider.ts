@@ -362,32 +362,31 @@ export default class TournamentDataProvider implements TournamentRepository {
     return pendingMatchDays; // Devolver todos los matchDays con partidos pendientes
   }
 
-  async findFixture(): Promise<Tournament[]> {
+  async findFixture(): Promise<MatchDay[]> {
     const tournaments = await this.client.findMany({
-      where: {
-        isActive: true, // Filtrar solo torneos activos
-      },
+      where: { isActive: true },
       include: {
-        matches: {
+        MatchDay: {
+          orderBy: { id: 'asc' }, // Ordenar los matchDays por id ascendente
           include: {
-            teamA: { include: { players: true } },
-            teamB: { include: { players: true } },
-            matchDay: true,
+            matches: {
+              include: {
+                teamA: { include: { players: true } },
+                teamB: { include: { players: true } },
+              },
+            },
           },
         },
-        MatchDay: true,
       },
-      orderBy: {
-        createdAt: 'asc', // Ordenar por createdAt en orden ascendente para obtener el más viejo
-      },
+      orderBy: { createdAt: 'asc' }, // Obtener el torneo más viejo
       take: 1,
     });
 
-    return this.classMapper.mapArrayAsync(
-      tournaments,
-      TournamentEntity,
-      Tournament,
-    );
+    const tournament = tournaments[0];
+    if (!tournament) return [];
+
+    // Devolver todos los MatchDays sin filtrar
+    return tournament.MatchDay; // Devolver todos los matchDays sin filtrado
   }
 
   async delete(id: number): Promise<Tournament> {

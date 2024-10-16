@@ -41,6 +41,9 @@ export default class Match {
   @AutoMap(() => Team) // Relación con Team B
   teamB?: Team;
 
+  @AutoMap()
+  winner?: string;
+
   @AutoMap(() => [MatchStats]) // Relación con MatchStats
   matchStats?: MatchStats[]; // Array de estadísticas de jugadores
 
@@ -53,6 +56,7 @@ export default class Match {
     resultTeamA?: number,
     resultTeamB?: number,
     matchStats?: MatchStats[], // Incluimos matchStats en el constructor
+    winner?: string,
     id?: number,
   ) {
     this.id = id;
@@ -63,6 +67,7 @@ export default class Match {
     this.map = map;
     this.resultTeamA = resultTeamA;
     this.resultTeamB = resultTeamB;
+    this.winner = winner;
     this.matchStats = matchStats; // Asignamos matchStats
   }
 }

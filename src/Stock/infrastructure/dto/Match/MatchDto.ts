@@ -24,6 +24,9 @@ export class MatchDto {
   @AutoMap(() => TeamDto)
   teamA?: TeamDto;
 
+  @AutoMap()
+  winner?: string;
+
   @AutoMap(() => TeamDto)
   teamB?: TeamDto;
 

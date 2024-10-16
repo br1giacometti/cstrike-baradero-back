@@ -13,6 +13,9 @@ export class UpdateMatchDto {
   @AutoMap()
   resultTeamB: number;
 
+  @AutoMap()
+  winner?: string;
+
   @AutoMap(() => MatchStats)
   matchStats: MatchStats[];
 

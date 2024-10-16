@@ -212,7 +212,7 @@ export default class TournamentService {
     return tournaments;
   }
 
-  async fetchFixtureActiveTournament(): Promise<Tournament[]> {
+  async fetchFixtureActiveTournament(): Promise<MatchDay[]> {
     const tournaments = await this.repository.findFixture();
     return tournaments;
   }

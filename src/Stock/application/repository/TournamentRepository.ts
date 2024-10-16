@@ -10,7 +10,7 @@ export default abstract class TournamentRepository extends BaseRepository<Tourna
   abstract validateTournamentsIds(ids: number[]): Promise<Tournament[] | null>;
 
   abstract findNextMatchDayWithMatches: () => Promise<MatchDay[]>;
-  abstract findFixture: () => Promise<Tournament[]>;
+  abstract findFixture: () => Promise<MatchDay[]>;
 
   abstract findAndCountWithQuery(
     skip: number,

@@ -24,6 +24,9 @@ class MatchEntity implements IMatchEntity {
   @AutoMap()
   teamBId: number;
 
+  @AutoMap()
+  winner: string;
+
   @AutoMap(() => TeamEntity)
   teamB: TeamEntity;
 

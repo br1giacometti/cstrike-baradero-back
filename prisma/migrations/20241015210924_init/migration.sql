@@ -57,6 +57,7 @@ CREATE TABLE "Match" (
     "resultTeamA" INTEGER NOT NULL,
     "resultTeamB" INTEGER NOT NULL,
     "map" TEXT NOT NULL,
+    "winner" TEXT,
 
     CONSTRAINT "Match_pkey" PRIMARY KEY ("id")
 );

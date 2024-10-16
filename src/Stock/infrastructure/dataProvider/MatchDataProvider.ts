@@ -158,12 +158,25 @@ export default class MatchDataProvider implements MatchRepository {
     partialMatch: Partial<UpdateMatchDto>,
   ): Promise<Match> {
     try {
+      // Determinar el ganador con una constante
+      const winner =
+        partialMatch.resultTeamA !== undefined &&
+        partialMatch.resultTeamB !== undefined
+          ? partialMatch.resultTeamA > partialMatch.resultTeamB
+            ? 'teamA'
+            : partialMatch.resultTeamB > partialMatch.resultTeamA
+            ? 'teamB'
+            : null // Si empatan, no hay ganador
+          : null;
+
+      // Actualizar el partido con la constante 'winner' incluida en el 'data'
       const matchEntity = await this.client.update({
         where: { id },
         data: {
           map: partialMatch.map,
           resultTeamA: partialMatch.resultTeamA,
           resultTeamB: partialMatch.resultTeamB,
+          winner, // Agregar 'winner' al registro
         },
         include: {
           tournament: true,
@@ -172,6 +185,7 @@ export default class MatchDataProvider implements MatchRepository {
         },
       });
 
+      // Devolver el partido actualizado mapeado
       return this.classMapper.mapAsync(matchEntity, MatchEntity, Match);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
