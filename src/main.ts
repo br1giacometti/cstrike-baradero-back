@@ -11,6 +11,8 @@ async function bootstrap() {
       'https://cstrike-baradero-front.vercel.app/',
       'https://cstrike-baradero-front.vercel.app/',
       'https://cstrike-baradero-front.vercel.app',
+      'https://www.csbaradero.com.ar/',
+      'https://www.csbaradero.com.ar',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
