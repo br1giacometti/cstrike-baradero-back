@@ -195,9 +195,7 @@ export default class TournamentDataProvider implements TournamentRepository {
     }>
   > {
     const tournaments = await this.client.findMany({
-      where: {
-        isActive: true,
-      },
+      where: { isActive: true },
       include: {
         teams: true,
         matches: {
@@ -209,9 +207,7 @@ export default class TournamentDataProvider implements TournamentRepository {
         },
         MatchDay: true,
       },
-      orderBy: {
-        createdAt: 'asc',
-      },
+      orderBy: { createdAt: 'asc' },
       take: 1,
     });
 
@@ -224,6 +220,7 @@ export default class TournamentDataProvider implements TournamentRepository {
       number,
       { wins: number; losses: number; points: number }
     >();
+    const directMatchWins = new Map<string, number>(); // Para registrar victorias directas
 
     for (const team of tournamentEntity.teams) {
       teamStats.set(team.id, { wins: 0, losses: 0, points: 0 });
@@ -232,43 +229,37 @@ export default class TournamentDataProvider implements TournamentRepository {
     for (const match of tournamentEntity.matches) {
       const { resultTeamA, resultTeamB, teamAId, teamBId, matchDay } = match;
 
-      // Verifica si el nombre de la jornada no es una de las fases finales
       if (
-        matchDay.name !== 'Semifinal 1' &&
-        matchDay.name !== 'Semifinal 2' &&
-        matchDay.name !== 'Final' &&
-        matchDay.name !== 'Tercer y Cuarto Puesto'
+        ![
+          'Semifinal 1',
+          'Semifinal 2',
+          'Final',
+          'Tercer y Cuarto Puesto',
+        ].includes(matchDay.name)
       ) {
         if (resultTeamA > resultTeamB) {
           // Equipo A gana
           teamStats.get(teamAId)!.wins++;
-          if (resultTeamA === 16) {
-            // Gana con 16 puntos
-            teamStats.get(teamAId)!.points += 3; // 3 puntos
-          } else if (resultTeamA > 17) {
-            // Gana con más de 17 puntos
-            teamStats.get(teamAId)!.points += 2; // 2 puntos
-          }
+          directMatchWins.set(
+            `${teamAId}-${teamBId}`,
+            (directMatchWins.get(`${teamAId}-${teamBId}`) || 0) + 1,
+          );
           teamStats.get(teamBId)!.losses++;
-          if (resultTeamB > 11 || resultTeamB >= 15) {
-            // Si el perdedor tiene más de 12 o 15 puntos
-            teamStats.get(teamBId)!.points += 1; // 1 punto
-          }
+
+          teamStats.get(teamAId)!.points += resultTeamA > 16 ? 2 : 3;
+          if (resultTeamB > 11) teamStats.get(teamBId)!.points += 1;
         } else if (resultTeamA < resultTeamB) {
           // Equipo B gana
           teamStats.get(teamBId)!.wins++;
-          if (resultTeamB === 16) {
-            // Gana con 16 puntos
-            teamStats.get(teamBId)!.points += 3; // 3 puntos
-          } else if (resultTeamB > 17) {
-            // Gana con más de 17 puntos
-            teamStats.get(teamBId)!.points += 2; // 2 puntos
-          }
+          directMatchWins.set(
+            `${teamBId}-${teamAId}`,
+            (directMatchWins.get(`${teamBId}-${teamAId}`) || 0) + 1,
+          );
           teamStats.get(teamAId)!.losses++;
-          if (resultTeamA > 11 || resultTeamA >= 15) {
-            // Si el perdedor tiene más de 11 o 15 puntos
-            teamStats.get(teamAId)!.points += 1; // 1 punto
-          }
+
+          // Asignación de puntos
+          teamStats.get(teamBId)!.points += resultTeamB > 16 ? 2 : 3;
+          if (resultTeamA > 11) teamStats.get(teamAId)!.points += 1;
         }
       }
     }
@@ -284,7 +275,29 @@ export default class TournamentDataProvider implements TournamentRepository {
       };
     });
 
-    return result.sort((a, b) => b.puntuacionTotal - a.puntuacionTotal);
+    return result.sort((a, b) => {
+      // Ordena por puntuación total
+      if (b.puntuacionTotal !== a.puntuacionTotal) {
+        return b.puntuacionTotal - a.puntuacionTotal;
+      }
+
+      // Si hay empate, compara las victorias en enfrentamientos directos
+      const directWinsA =
+        directMatchWins.get(`${a.idEquipo}-${b.idEquipo}`) || 0;
+      const directWinsB =
+        directMatchWins.get(`${b.idEquipo}-${a.idEquipo}`) || 0;
+
+      if (directWinsA !== directWinsB) {
+        return directWinsB - directWinsA; // Más victorias directas primero
+      }
+      // Ordena por victorias totales
+      if (b.victoriasTotales !== a.victoriasTotales) {
+        return b.victoriasTotales - a.victoriasTotales;
+      }
+
+      // Si aún hay empate, menor número de derrotas
+      return a.derrotasTotales - b.derrotasTotales;
+    });
   }
 
   async getSemiFinalResults(idTournament: number): Promise<
