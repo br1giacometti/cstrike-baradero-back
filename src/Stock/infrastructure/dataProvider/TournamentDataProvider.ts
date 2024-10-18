@@ -220,15 +220,22 @@ export default class TournamentDataProvider implements TournamentRepository {
       number,
       { wins: number; losses: number; points: number }
     >();
+    const matchDayStats = new Map<
+      number,
+      Map<number, { wins: number; losses: number }>
+    >();
     const directMatchWins = new Map<string, number>(); // Para registrar victorias directas
 
+    // Inicializa las estadísticas de los equipos
     for (const team of tournamentEntity.teams) {
       teamStats.set(team.id, { wins: 0, losses: 0, points: 0 });
     }
 
+    // Procesar cada partido del torneo
     for (const match of tournamentEntity.matches) {
       const { resultTeamA, resultTeamB, teamAId, teamBId, matchDay } = match;
 
+      // Excluir fases finales
       if (
         ![
           'Semifinal 1',
@@ -237,33 +244,60 @@ export default class TournamentDataProvider implements TournamentRepository {
           'Tercer y Cuarto Puesto',
         ].includes(matchDay.name)
       ) {
-        if (resultTeamA > resultTeamB) {
-          // Equipo A gana
-          teamStats.get(teamAId)!.wins++;
-          directMatchWins.set(
-            `${teamAId}-${teamBId}`,
-            (directMatchWins.get(`${teamAId}-${teamBId}`) || 0) + 1,
-          );
-          teamStats.get(teamBId)!.losses++;
+        // Verificar que el partido se haya jugado
+        if (resultTeamA > 0 || resultTeamB > 0) {
+          const updateStats = (winnerId: number, loserId: number) => {
+            const winnerStats = teamStats.get(winnerId)!;
+            const loserStats = teamStats.get(loserId)!;
 
-          teamStats.get(teamAId)!.points += resultTeamA > 16 ? 2 : 3;
-          if (resultTeamB > 11) teamStats.get(teamBId)!.points += 1;
-        } else if (resultTeamA < resultTeamB) {
-          // Equipo B gana
-          teamStats.get(teamBId)!.wins++;
-          directMatchWins.set(
-            `${teamBId}-${teamAId}`,
-            (directMatchWins.get(`${teamBId}-${teamAId}`) || 0) + 1,
-          );
-          teamStats.get(teamAId)!.losses++;
+            winnerStats.wins++;
+            loserStats.losses++;
 
-          // Asignación de puntos
-          teamStats.get(teamBId)!.points += resultTeamB > 16 ? 2 : 3;
-          if (resultTeamA > 11) teamStats.get(teamAId)!.points += 1;
+            directMatchWins.set(
+              `${winnerId}-${loserId}`,
+              (directMatchWins.get(`${winnerId}-${loserId}`) || 0) + 1,
+            );
+
+            // Registrar estadísticas por MatchDay
+            if (!matchDayStats.has(matchDay.id)) {
+              matchDayStats.set(matchDay.id, new Map());
+            }
+            const dayStats = matchDayStats.get(matchDay.id)!;
+            if (!dayStats.has(winnerId))
+              dayStats.set(winnerId, { wins: 0, losses: 0 });
+            if (!dayStats.has(loserId))
+              dayStats.set(loserId, { wins: 0, losses: 0 });
+
+            dayStats.get(winnerId)!.wins++;
+            dayStats.get(loserId)!.losses++;
+          };
+
+          if (resultTeamA > resultTeamB) {
+            // Equipo A gana
+            updateStats(teamAId, teamBId);
+            teamStats.get(teamAId)!.points += resultTeamA > 16 ? 2 : 3;
+            if (resultTeamB > 11) teamStats.get(teamBId)!.points += 1;
+          } else {
+            // Equipo B gana
+            updateStats(teamBId, teamAId);
+            teamStats.get(teamBId)!.points += resultTeamB > 16 ? 2 : 3;
+            if (resultTeamA > 11) teamStats.get(teamAId)!.points += 1;
+          }
         }
       }
     }
 
+    // **Aplicar el bonus por MatchDay**
+    for (const [matchDayId, teamResults] of matchDayStats) {
+      for (const [teamId, { wins, losses }] of teamResults) {
+        if (wins >= 2 && losses === 0) {
+          // Solo aplicar el bonus si no se ha aplicado antes
+          teamStats.get(teamId)!.points += 2;
+        }
+      }
+    }
+
+    // Preparar el resultado final
     const result = tournamentEntity.teams.map((team) => {
       const stats = teamStats.get(team.id) || { wins: 0, losses: 0, points: 0 };
       return {
@@ -275,27 +309,25 @@ export default class TournamentDataProvider implements TournamentRepository {
       };
     });
 
+    // Ordenar los equipos según los criterios definidos
     return result.sort((a, b) => {
-      // Ordena por puntuación total
       if (b.puntuacionTotal !== a.puntuacionTotal) {
         return b.puntuacionTotal - a.puntuacionTotal;
       }
 
-      // Si hay empate, compara las victorias en enfrentamientos directos
       const directWinsA =
         directMatchWins.get(`${a.idEquipo}-${b.idEquipo}`) || 0;
       const directWinsB =
         directMatchWins.get(`${b.idEquipo}-${a.idEquipo}`) || 0;
 
       if (directWinsA !== directWinsB) {
-        return directWinsB - directWinsA; // Más victorias directas primero
+        return directWinsB - directWinsA;
       }
-      // Ordena por victorias totales
+
       if (b.victoriasTotales !== a.victoriasTotales) {
         return b.victoriasTotales - a.victoriasTotales;
       }
 
-      // Si aún hay empate, menor número de derrotas
       return a.derrotasTotales - b.derrotasTotales;
     });
   }
