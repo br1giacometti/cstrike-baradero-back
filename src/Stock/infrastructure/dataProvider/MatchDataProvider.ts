@@ -198,6 +198,37 @@ export default class MatchDataProvider implements MatchRepository {
     }
   }
 
+  async updateTeams(
+    id: number,
+    partialMatch: Partial<UpdateMatchDto>,
+  ): Promise<Match> {
+    try {
+      const matchEntity = await this.client.update({
+        where: { id },
+        data: {
+          teamAId: partialMatch.teamAId,
+          teamBId: partialMatch.teamBId,
+        },
+        include: {
+          tournament: true,
+          teamA: true,
+          teamB: true,
+        },
+      });
+
+      // Devolver el partido actualizado mapeado
+      return this.classMapper.mapAsync(matchEntity, MatchEntity, Match);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new MatchNotFoundException();
+        }
+        throw new Error(error.message);
+      }
+      throw new Error('Unknown error');
+    }
+  }
+
   async validateMatchsIds(ids: number[]): Promise<Match[] | null> {
     const matchEntity = await this.client.findMany({
       where: { id: { in: ids } },

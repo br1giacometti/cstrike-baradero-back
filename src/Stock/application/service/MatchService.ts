@@ -8,6 +8,7 @@ import MatchValidations from '../validations/MatchValidations';
 import { MatchDto } from 'Stock/infrastructure/dto/Match/MatchDto';
 import MatchStatsService from './MatchStatsService';
 import MatchStats from 'Stock/domain/models/MatchStats';
+import { UpdateMatchDto } from 'Stock/infrastructure/dto/Match/UpdateMatchDto';
 
 @Injectable()
 export default class MatchService {
@@ -51,6 +52,15 @@ export default class MatchService {
     for (const stat of match.matchStats) {
       await this.matchStatService.createMatchStats(stat);
     }
+
+    return matchUpdated;
+  }
+
+  async updateTeamsMatch(id: number, match: Match): Promise<Match> {
+    const matchUpdated = await this.repository.updateTeams(id, {
+      teamAId: match.teamAId,
+      teamBId: match.teamBId,
+    });
 
     return matchUpdated;
   }

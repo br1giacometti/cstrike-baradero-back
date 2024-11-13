@@ -167,6 +167,33 @@ export default class MatchController {
       });
   }
 
+  @Patch('/teams/:id')
+  @UseInterceptors(MapInterceptor(Match, MatchDto))
+  async updateTeamsMatch(
+    @Body() matchDto: UpdateMatchDto, // Se asegura de que sea UpdateMatchDto
+    @Param('id') matchId: string,
+    @I18n() i18n: I18nContext,
+  ): Promise<MatchDto> {
+    // Realiza el mapeo de matchDto a Match
+    const match = await this.classMapper.mapAsync(
+      matchDto,
+      UpdateMatchDto,
+      Match, //
+    );
+
+    return this.matchService
+      .updateTeamsMatch(parseInt(matchId), match)
+      .then((updatedMatch) => updatedMatch)
+      .catch((error) => {
+        switch (error.name) {
+          case 'MatchNotFoundException':
+            throw new HttpException(i18n.t(error.message), 404);
+          default:
+            throw new HttpException(error.message, 500);
+        }
+      });
+  }
+
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async deleteMatch(@Param('id') matchId: string): Promise<boolean> {

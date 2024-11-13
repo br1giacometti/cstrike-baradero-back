@@ -19,6 +19,12 @@ export class UpdateMatchDto {
   @AutoMap(() => MatchStats)
   matchStats: MatchStats[];
 
+  @AutoMap()
+  teamAId?: number;
+
+  @AutoMap()
+  teamBId?: number;
+
   constructor(data: z.infer<typeof UpdateMatchSchema>) {
     Object.assign(this, data); // Asigna los datos del esquema a la instancia
   }
