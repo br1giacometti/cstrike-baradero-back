@@ -206,8 +206,8 @@ export default class MatchDataProvider implements MatchRepository {
       const matchEntity = await this.client.update({
         where: { id },
         data: {
-          teamAId: partialMatch.teamAId,
-          teamBId: partialMatch.teamBId,
+          teamA: { connect: { id: partialMatch.teamAId } },
+          teamB: { connect: { id: partialMatch.teamBId } },
         },
         include: {
           tournament: true,
